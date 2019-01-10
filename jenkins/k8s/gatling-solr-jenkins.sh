@@ -18,7 +18,7 @@ CID=`docker container ls -aq -f "name=kubectl_support"`
 # initialise the k8s cluster with zookeepers, solr clusters, gatling-solr image
 docker exec kubectl_support kubectl create -f /opt/cluster.yaml
 # wait until all pods comes up running
-TOTAL_PODS=echo `docker exec kubectl_support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
+TOTAL_PODS=`echo docker exec kubectl_support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
 while [ "${TOTAL_PODS}" != "7" ]
 do
    sleep 30

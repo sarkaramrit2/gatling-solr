@@ -21,10 +21,8 @@ else
 fi
 
 docker exec kubectl_support gcloud auth activate-service-account --key-file /opt/${GCP_KEY_FILE}
-#docker exec kubectl_support gcloud init --console-only
 docker exec kubectl_support gcloud config get-value core/account
 docker exec kubectl_support gcloud config set project strange-team-223300
 docker exec kubectl_support gcloud config set compute/zone us-central1-a
-#docker exec kubectl_support gcloud auth configure-docker
 docker exec kubectl_support gcloud config list
 docker exec kubectl_support gcloud container clusters get-credentials solr-cluster
