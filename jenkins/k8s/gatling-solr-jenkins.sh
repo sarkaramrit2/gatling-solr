@@ -19,7 +19,7 @@ CID=`docker container ls -aq -f "name=kubectl_support"`
 docker exec kubectl_support kubectl create -f /opt/cluster.yaml
 # wait until all pods comes up running
 TOTAL_PODS=`docker exec kubectl_support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
-while [ "${TOTAL_PODS}" != "7" ]
+while [ "${TOTAL_PODS}" != "6" ]
 do
    sleep 30
    TOTAL_PODS=`docker exec kubectl_support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
