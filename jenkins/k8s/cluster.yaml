@@ -51,7 +51,7 @@ spec:
     matchLabels:
       app: solr-dummy-cluster
   serviceName: solr-hs-dummy-cluster
-  replicas: 1
+  replicas: 2
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: Parallel
@@ -145,7 +145,7 @@ spec:
   selector:
     matchLabels:
       app: solr-dummy-cluster
-  maxUnavailable: 0
+  maxUnavailable: 1
 
 ---
 # Source: solr-base/templates/zookeeper.yaml
