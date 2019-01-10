@@ -112,7 +112,7 @@ while read -r CLASS; do
     IF_CMD_EXEC=`docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- ps | grep "gatling" | wc -l`
     while [ "${IF_CMD_EXEC}" != "0" ]
     do
-        sleep 10
+        sleep 20
         IF_CMD_EXEC=`docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- ps | grep "gatling" | wc -l`
     done
 
