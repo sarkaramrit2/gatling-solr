@@ -5,15 +5,17 @@
 # delete pods
 docker exec kubectl-support kubectl delete --all pods --namespace=jenkins
 # remove namespace
-docker exec kubectl-support kubectl delete namespaces jenkins
+RESPONSE=docker exec kubectl-support kubectl delete namespaces jenkins
 
+if [ "${RESPONSE}" != "Error response from daemon: No such container: kubectl-support" ]; then
 # check status of the pods in every 30 seconds
 PODS_STATUS=echo `docker exec kubectl-support kubectl get pods --namespace=jenkins`
-while [ "${PODS_STATUS}" != "No resources found." ]
-do
-   sleep 30
-   PODS_STATUS=echo `kubectl get pods --namespace=jenkins`
-done
+    while [ "${PODS_STATUS}" != "No resources found." ]
+    do
+        sleep 30
+        PODS_STATUS=echo `kubectl get pods --namespace=jenkins`
+    done
+fi
 
 # stop containers
 CID=`docker container ls -aq -f "name=kubectl-support"`
