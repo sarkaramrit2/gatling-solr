@@ -28,7 +28,7 @@ done
 # create collection 'wiki' with shards 2 replicas 2
 docker cp ./jenkins/collection-config ${CID}:/opt/collection-config
 docker exec kubectl_support kubectl cp /opt/collection-config jenkins/solr-dummy-cluster-0:/opt/solr/collection-config
-docker exec kubectl_support kubectl exec solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s 2 -rf 2 -d /opt/solr/collection-config/
+docker exec kubectl_support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s 2 -rf 2 -d /opt/solr/collection-config/
 
 # optional property files a user may have uploaded to jenkins
 # Note: Jenkins uses the same string for the file name, and the ENV var,
@@ -100,11 +100,11 @@ fi
 echo "JOB DESCRIPTION: ${SIMULATION_CLASS} running....."
 
 # create results directory on the docker
-docker exec kubectl_support kubectl exec -- gatling-solr mkdir -p /tmp/gatling-perf-tests/results
+docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- mkdir -p /tmp/gatling-perf-tests/results
 # run gatling test for a simulation and pass relevant params
-docker exec kubectl_support kubectl exec -- gatling-solr JAVA_OPTS="-Xmx1g -Xms1g -Xss512k" gatling.sh -s ${SIMULATION_CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests/results -nr || echo "Current Simulation Ended!!"
+docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- JAVA_OPTS="-Xmx1g -Xms1g -Xss512k" gatling.sh -s ${SIMULATION_CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests/results -nr || echo "Current Simulation Ended!!"
 # generate the reports
-docker exec kubectl_support kubectl exec -- gatling-solr gatling.sh -ro /tmp/gatling-perf-tests/
+docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- gatling.sh -ro /tmp/gatling-perf-tests/
 # copy the perf tests to the workspace
 mkdir -p workspace/reports-${BUILD_NUMBER}
 docker exec mkdir -p /opt/reports/
