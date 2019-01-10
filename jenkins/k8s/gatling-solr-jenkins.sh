@@ -108,6 +108,6 @@ docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- gatling.sh -
 docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- gatling.sh -ro /tmp/gatling-perf-tests/
 # copy the perf tests to the workspace
 mkdir -p workspace/reports-${BUILD_NUMBER}
-docker exec mkdir -p /opt/reports/
+docker exec kubectl_support mkdir -p /opt/reports/
 docker exec kubectl_support kubectl cp jenkins/gatling-solr:/tmp/gatling-perf-tests/ /opt/reports/
 docker cp ${CID}:/opt/reports ./workspace/reports-${BUILD_NUMBER}
