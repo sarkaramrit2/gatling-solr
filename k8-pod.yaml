@@ -1,0 +1,13 @@
+---
+ apiVersion: v1
+ kind: Pod
+ metadata:
+   name: gatling-solr
+   labels:
+     app: job
+ spec:
+   containers:
+     - name: gatling-solr
+       image: sarkaramrit2/gatling-solr:latest
+       ports:
+         - containerPort: 80

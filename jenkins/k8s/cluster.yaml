@@ -1,0 +1,314 @@
+---
+# Source: solr-base/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jenkins
+
+---
+# Source: solr-base/templates/solr-base.yaml
+# This file can be used to deploy solr nodes with a zk quorum
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: solr-cs-dummy-cluster
+  namespace: jenkins
+  labels:
+    app: solr-dummy-cluster
+spec:
+  ports:
+  - port: 8983
+    name: http-solr-cs
+  selector:
+    app: solr-dummy-cluster
+  type: NodePort
+---
+# Source: solr-cloud-istio/templates/solr.yaml
+# this service is used for inter-communication between solr nodes
+apiVersion: v1
+kind: Service
+metadata:
+  name: solr-hs-dummy-cluster
+  namespace: jenkins
+  labels:
+    app: solr-dummy-cluster
+spec:
+  ports:
+  - port: 8983
+    name: http-solr-hs
+  clusterIP: None
+  selector:
+    app: solr-dummy-cluster
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: solr-dummy-cluster
+  namespace: jenkins
+spec:
+  selector:
+    matchLabels:
+      app: solr-dummy-cluster
+  serviceName: solr-hs-dummy-cluster
+  replicas: 2
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: solr-dummy-cluster
+        solr_version: 7.6.0
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      securityContext:
+        fsGroup: 8983
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: "app"
+                operator: In
+                values:
+                - solr-dummy-cluster
+            topologyKey: "kubernetes.io/hostname"
+      volumes:
+      - name: solrlogs
+        emptyDir: {}
+      containers:
+      - name: solr
+        image: "eu.gcr.io/strange-team-223300/managed-solr@sha256:dc82654bae57a0eed73e18601e29108a78b22d9fe9fee3bf84caddad38a9d332"
+        # "eu.gcr.io/strange-team-223300/managed-solr@sha256:dc82654bae57a0eed73e18601e29108a78b22d9fe9fee3bf84caddad38a9d332"
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+
+        ports:
+        - containerPort: 8983
+          name: client
+        env:
+        - name: SOLR_HOME
+          value: "/opt/solr/server/solr"
+        - name: SOLR_PORT
+          value: "8983"
+        - name: ZK_HOST
+          value: "zk-dummy-cluster-0.zk-hs-dummy-cluster:2181,zk-dummy-cluster-1.zk-hs-dummy-cluster:2181,zk-dummy-cluster-2.zk-hs-dummy-cluster:2181"
+        - name: SOLR_LOGS_DIR
+          value: "/opt/solr/logs"
+        - name: SOLR_DATA_HOME
+          value: "/opt/solr/data"
+        livenessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          httpGet:
+            path: /solr/admin/info/system
+            port: 8983
+        readinessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          httpGet:
+            path: /solr/admin/info/system
+            port: 8983
+        volumeMounts:
+        - name: data
+          mountPath: /opt/solr/data
+        - name: solrlogs
+          mountPath: /opt/solr/logs
+      initContainers:
+      - name: check-zk
+        image: busybox:latest
+        command: ['sh', '-c', 'COUNTER=0; while [  $COUNTER -lt 30 ]; do for i in "zk-dummy-cluster-1.zk-hs-dummy-cluster" "zk-dummy-cluster-2.zk-hs-dummy-cluster"; do mode=$(echo srvr | nc $i 2181 | grep "Mode"); if [ "$mode" == "Mode: leader" ]; then exit 0; fi; done; let COUNTER=COUNTER+1; sleep 2; done; echo "Did NOT see a ZK leader after 60 secs!"; exit 1;']
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "10Gi"
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: solr-pdb-dummy-cluster
+  namespace: jenkins
+spec:
+  selector:
+    matchLabels:
+      app: solr-dummy-cluster
+  maxUnavailable: 1
+
+---
+# Source: solr-base/templates/zookeeper.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-hs-dummy-cluster
+  namespace: jenkins
+  labels:
+    app: zk-dummy-cluster
+spec:
+  ports:
+  - port: 2888
+    name: server
+  - port: 3888
+    name: leader-election
+  - port: 2181
+    name: client
+  clusterIP: None
+  selector:
+    app: zk-dummy-cluster
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-cs-dummy-cluster
+  namespace: jenkins
+  labels:
+    app: zk-dummy-cluster
+spec:
+  ports:
+  - port: 2181
+    name: client
+  selector:
+    app: zk-dummy-cluster
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: zk-pdb-dummy-cluster
+  namespace: jenkins
+spec:
+  selector:
+    matchLabels:
+      app: zk-dummy-cluster
+  maxUnavailable: 1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zk-dummy-cluster
+  namespace: jenkins
+spec:
+  selector:
+    matchLabels:
+      app: zk-dummy-cluster
+  serviceName: zk-hs-dummy-cluster
+  replicas: 3
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        app: zk-dummy-cluster
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: "app"
+                operator: In
+                values:
+                - zk-dummy-cluster
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: kubernetes-zookeeper
+        imagePullPolicy: Always
+        image: "k8s.gcr.io/kubernetes-zookeeper:1.0-3.4.10"
+        resources:
+          limits:
+            cpu: 250m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+
+        ports:
+        - containerPort: 2181
+          name: client
+        - containerPort: 2888
+          name: server
+        - containerPort: 3888
+          name: leader-election
+        command:
+        - sh
+        - -c
+        - "start-zookeeper \
+          --servers=3 \
+          --data_dir=/var/lib/zookeeper/data \
+          --data_log_dir=/var/lib/zookeeper/data/log \
+          --conf_dir=/opt/zookeeper/conf \
+          --client_port=2181 \
+          --election_port=3888 \
+          --server_port=2888 \
+          --tick_time=2000 \
+          --init_limit=10 \
+          --sync_limit=5 \
+          --heap=512M \
+          --max_client_cnxns=60 \
+          --snap_retain_count=3 \
+          --purge_interval=12 \
+          --max_session_timeout=40000 \
+          --min_session_timeout=4000 \
+          --log_level=INFO"
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "zookeeper-ready 2181"
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "zookeeper-ready 2181"
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: datadir
+          mountPath: /var/lib/zookeeper
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "10Gi"
+
+---
+# Source: solr-base/templates/gatling-solr.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gatling-solr
+  namespace: jenkins
+  labels:
+    app: job
+spec:
+  containers:
+  - name: gatling-solr
+    image: sarkaramrit2/gatling-solr:latest
+    ports:
+    - containerPort: 80
