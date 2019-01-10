@@ -97,9 +97,10 @@ else
   rm -rf ./SIMULATION_FILE ./workspace/simulations/${SIMULATION_FILE}
 fi
 
-#execute the load test on docker
+# execute the load test on docker
 echo "JOB DESCRIPTION: running....."
 
+# read each class and execute the tests
 while read -r CLASS; do
 
     # create results directory on the docker

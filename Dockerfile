@@ -39,6 +39,8 @@ RUN apt-get update && \
     cd /tmp/downloads/gatling-solr/gatling-solr && \
     git checkout $GATLING_SOLR_BRANCH && \
     sbt assembly && \
+    # install ps
+    apt-get install procps -y && \
     cd /
 
 # install gatling
