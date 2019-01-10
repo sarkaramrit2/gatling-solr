@@ -13,7 +13,7 @@ mkdir -p workspace/configs
 mkdir -p workspace/data
 mkdir -p workspace/simulations
 
-CID=`docker container ls -aq -f "name=kubectl-support"`
+CID=`docker container ls -aq -f "name=kubectl_support"`
 
 # initialise the k8s cluster with zookeepers, solr clusters, gatling-solr image
 docker exec kubectl_support kubectl create -f /opt/cluster.yaml

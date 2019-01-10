@@ -8,7 +8,7 @@ set -x
 
 docker run -it -d --rm --name kubectl_support sarkaramrit2/kubectl-support
 # set container id in which the docker is running
-CID=`docker container ls -aq -f "name=kubectl-support"`
+CID=`docker container ls -aq -f "name=kubectl_support"`
 
 if [ ! -z "${GCP_KEY_FILE}" ]; then
   if  [ ! -f ./GCP_KEY_FILE ]; then
