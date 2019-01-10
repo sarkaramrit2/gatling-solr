@@ -109,6 +109,7 @@ while read -r CLASS; do
     # run gatling test for a simulation and pass relevant params
     docker exec -d kubectl_support kubectl exec -n jenkins gatling-solr -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${CLASS}/results -nr || echo "Current Simulation Ended!!"
 
+    docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- ps
     IF_CMD_EXEC=`docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- ps | grep "gatling" | wc -l`
     while [ "${IF_CMD_EXEC}" != "0" ]
     do
