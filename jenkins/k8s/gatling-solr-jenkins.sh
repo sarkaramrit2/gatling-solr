@@ -110,8 +110,8 @@ while read -r CLASS; do
     docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- gatling.sh -ro /tmp/gatling-perf-tests-${CLASS}/
     # copy the perf tests to the workspace
     mkdir -p workspace/reports-${CLASS}-${BUILD_NUMBER}
-    docker exec kubectl_support mkdir -p /opt/reports-${CLASS}/
-    docker exec kubectl_support kubectl cp jenkins/gatling-solr:/tmp/gatling-perf-tests-${CLASS}/ /opt/reports-${CLASS}/
-    docker cp ${CID}:/opt/reports ./workspace/reports-${CLASS}-${BUILD_NUMBER}
+    docker exec kubectl_support mkdir -p /opt/reports-${CLASS}
+    docker exec kubectl_support kubectl cp jenkins/gatling-solr:/tmp/gatling-perf-tests-${CLASS}/ /opt/reports-${CLASS}
+    docker cp ${CID}:/opt/reports-${CLASS} ./workspace/reports-${CLASS}-${BUILD_NUMBER}
 
 done <<< "${SIMULATION_CLASS}"
