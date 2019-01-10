@@ -50,8 +50,6 @@ class SolrIndexV2RequestAction[K, V](val solrClients: util.ArrayList[CloudSolrCl
     updateRequest.add(solrAttributes.payload)
 
     val requestStartDate = clock.nowMillis
-    val response = solrClient.request(updateRequest)
-
     try {
       solrClient.request(updateRequest)
       val requestEndDate = clock.nowMillis
