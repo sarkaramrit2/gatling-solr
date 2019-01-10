@@ -5,7 +5,7 @@
 # delete pods
 docker exec kubectl-support kubectl delete --all pods --namespace=jenkins
 # remove namespace
-RESPONSE=docker exec kubectl-support kubectl delete namespaces jenkins
+RESPONSE=echo `docker exec kubectl-support kubectl delete namespaces jenkins`
 
 if [ "${RESPONSE}" != "Error response from daemon: No such container: kubectl-support" ]; then
 # check status of the pods in every 30 seconds
