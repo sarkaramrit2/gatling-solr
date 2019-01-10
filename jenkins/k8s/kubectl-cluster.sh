@@ -20,6 +20,9 @@ else
   rm -rf ./GCP_KEY_FILE
 fi
 
+# delete the GCP file
+rm -rf ./GCP_KEY_FILE
+
 docker exec kubectl_support gcloud auth activate-service-account --key-file /opt/${GCP_KEY_FILE}
 docker exec kubectl_support gcloud config get-value core/account
 docker exec kubectl_support gcloud config set project strange-team-223300
