@@ -102,7 +102,7 @@ echo "JOB DESCRIPTION: ${SIMULATION_CLASS} running....."
 # create results directory on the docker
 docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- mkdir -p /tmp/gatling-perf-tests/results
 # run gatling test for a simulation and pass relevant params
-docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- JAVA_OPTS="-Xmx1g -Xms1g -Xss512k" gatling.sh -s ${SIMULATION_CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests/results -nr || echo "Current Simulation Ended!!"
+docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- gatling.sh -s ${SIMULATION_CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests/results -nr || echo "Current Simulation Ended!!"
 # generate the reports
 docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- gatling.sh -ro /tmp/gatling-perf-tests/
 # copy the perf tests to the workspace
