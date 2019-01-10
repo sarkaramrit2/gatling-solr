@@ -9,7 +9,7 @@ if [ ! -z "${CID}" ]; then
 
 # check status of the pods in every 30 seconds
     PODS_STATUS=`docker exec kubectl_support kubectl get pods --namespace=jenkins`
-    while [ "${PODS_STATUS}" != "No resources found." ]
+    while [ ! -z "${PODS_STATUS}" ]
     do
         sleep 30
         PODS_STATUS=`docker exec kubectl_support kubectl get pods --namespace=jenkins`
