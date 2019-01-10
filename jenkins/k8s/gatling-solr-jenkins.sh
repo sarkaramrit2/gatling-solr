@@ -22,7 +22,7 @@ TOTAL_PODS=`echo docker exec kubectl_support kubectl get pods --field-selector=s
 while [ "${TOTAL_PODS}" != "7" ]
 do
    sleep 30
-   TOTAL_PODS=echo `kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
+   TOTAL_PODS=`echo kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
 done
 
 # create collection 'wiki' with shards 2 replicas 2
