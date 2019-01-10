@@ -12,6 +12,6 @@ RUN \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
     apt-get update -y && apt-get install google-cloud-sdk -y && \
     apt-get install kubectl -y && \
-    cd /opt/ && wget -o https://raw.githubusercontent.com/sarkaramrit2/gatling-solr/master/jenkins/k8s/cluster.yaml
+    cd /opt/ && wget https://raw.githubusercontent.com/sarkaramrit2/gatling-solr/master/jenkins/k8s/cluster.yaml
     
 CMD tail -f /dev/null

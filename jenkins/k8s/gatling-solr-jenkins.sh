@@ -13,10 +13,12 @@ mkdir -p workspace/configs
 mkdir -p workspace/data
 mkdir -p workspace/simulations
 
+CID=`docker container ls -aq -f "kubectl_support"`
+
 # initialise the k8s cluster with zookeepers, solr clusters, gatling-solr image
-kubectl create -f jenkins/k8s/cluster.yaml
+docker exec kubectl_support kubectl create -f /opt/cluster.yaml
 # wait until all pods comes up running
-TOTAL_PODS=echo `kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
+TOTAL_PODS=echo `docker exec kubectl_support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
 while [ "${TOTAL_PODS}" != "7" ]
 do
    sleep 30
@@ -24,8 +26,9 @@ do
 done
 
 # create collection 'wiki' with shards 2 replicas 2
-kubectl cp ./jenkins/collection-config jenkins/solr-dummy-cluster-0:/opt/solr/collection-config
-kubectl exec solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s 2 -rf 2 -d /opt/solr/collection-config/
+docker cp ./jenkins/collection-config ${CID}:/opt/collection-config
+docker exec kubectl_support kubectl cp ./opt/collection-config jenkins/solr-dummy-cluster-0:/opt/solr/collection-config
+docker exec kubectl_support kubectl exec solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s 2 -rf 2 -d /opt/solr/collection-config/
 
 # optional property files a user may have uploaded to jenkins
 # Note: Jenkins uses the same string for the file name, and the ENV var,
@@ -37,8 +40,9 @@ if [ ! -z "${INDEX_PROP_FILE}" ]; then
   echo "Copying user supplied index config to workspace/configs/index.config.properties"
   cp ./INDEX_PROP_FILE ./workspace/configs/index.config.properties
 
-  # copy the configs from local to docker
-  kubectl cp ./workspace/configs/index.config.properties jenkins/gatling-solr:/opt/gatling/user-files/configs/index.config.properties
+  # copy the configs from local to dockers
+  docker cp ./workspace/configs/index.config.properties ${CID}:/opt/index.config.properties
+  docker exec kubectl_support kubectl cp /opt/index.config.properties jenkins/gatling-solr:/opt/gatling/user-files/configs/index.config.properties
 else
   rm -rf ./INDEX_PROP_FILE ./workspace/configs/index.config.properties
 fi
@@ -51,8 +55,9 @@ if [ ! -z "${QUERY_PROP_FILE}" ]; then
   echo "Copying user supplied query config to workspace/configs/query.config.properties"
   cp ./QUERY_PROP_FILE ./workspace/configs/query.config.properties
 
-  # copy the configs from local to docker
-  kubectl cp ./workspace/configs/query.config.properties jenkins/gatling-solr:/opt/gatling/user-files/configs/query.config.properties
+  # copy the configs from local to dockers
+  docker cp ./workspace/configs/query.config.properties ${CID}:/opt/query.config.properties
+  docker exec kubectl_support kubectl cp /opt/query.config.properties jenkins/gatling-solr:/opt/gatling/user-files/configs/query.config.properties
 else
   rm -rf ./QUERY_PROP_FILE ./workspace/configs/query.config.properties
 fi
@@ -69,8 +74,9 @@ if [ ! -z "${DATA_FILE}" ]; then
   echo "Copying user supplied patch to workspace/data/${DATA_FILE}"
   cp ./DATA_FILE ./workspace/data/${DATA_FILE}
 
-  # copy the data from local to docker
-  kubectl cp ./workspace/data/${DATA_FILE} jenkins/gatling-solr:/opt/gatling/user-files/data/${DATA_FILE}
+  # copy the data from local to dockers
+  docker cp ./workspace/configs/${DATA_FILE} ${CID}:/opt/${DATA_FILE}
+  docker exec kubectl_support kubectl cp /opt/${DATA_FILE} jenkins/gatling-solr:/opt/gatling/user-files/data/${DATA_FILE}
 else
   rm -rf ./DATA_FILE ./workspace/data/${DATA_FILE}
 fi
@@ -83,8 +89,9 @@ if [ ! -z "${SIMULATION_FILE}" ]; then
   echo "Copying user supplied patch to workspace/data/${SIMULATION_FILE}"
   cp ./SIMULATION_FILE ./workspace/simulations/${SIMULATION_FILE}
 
-  # copy the simulation file from local to docker
-  kubectl cp ./workspace/simulations/${SIMULATION_FILE} jenkins/gatling-solr:/opt/gatling/user-files/simulations/${SIMULATION_FILE}
+  # copy the simulation file from local to dockers
+  docker cp ./workspace/simulations/${SIMULATION_FILE} ${CID}:/opt/${SIMULATION_FILE}
+  docker exec kubectl_support kubectl cp /opt/${SIMULATION_FILE} jenkins/gatling-solr:/opt/gatling/user-files/simulations/${SIMULATION_FILE}
 else
   rm -rf ./SIMULATION_FILE ./workspace/simulations/${SIMULATION_FILE}
 fi
@@ -93,11 +100,13 @@ fi
 echo "JOB DESCRIPTION: ${SIMULATION_CLASS} running....."
 
 # create results directory on the docker
-kubectl exec -- gatling-solr mkdir -p /tmp/gatling-perf-tests/results
+docker exec kubectl_support kubectl exec -- gatling-solr mkdir -p /tmp/gatling-perf-tests/results
 # run gatling test for a simulation and pass relevant params
-kubectl exec -- gatling-solr JAVA_OPTS="-Xmx1g -Xms1g -Xss512k" gatling.sh -s ${SIMULATION_CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests/results -nr || echo "Current Simulation Ended!!"
+docker exec kubectl_support kubectl exec -- gatling-solr JAVA_OPTS="-Xmx1g -Xms1g -Xss512k" gatling.sh -s ${SIMULATION_CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests/results -nr || echo "Current Simulation Ended!!"
 # generate the reports
-kubectl exec -- gatling-solr gatling.sh -ro /tmp/gatling-perf-tests/
+docker exec kubectl_support kubectl exec -- gatling-solr gatling.sh -ro /tmp/gatling-perf-tests/
 # copy the perf tests to the workspace
-mkdir -p workspace/reports/
-kubectl cp jenkins/gatling-solr:/tmp/gatling-perf-tests/ ./workspace/reports/
+mkdir -p workspace/reports-${BUILD_NUMBER}
+docker exec mkdir -p /opt/reports/
+docker exec kubectl_support kubectl cp jenkins/gatling-solr:/tmp/gatling-perf-tests/ /opt/reports/
+docker cp ${CID}:/opt/reports ./workspace/reports-${BUILD_NUMBER}
