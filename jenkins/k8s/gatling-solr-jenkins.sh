@@ -105,14 +105,23 @@ while read -r CLASS; do
 
     # create results directory on the docker
     docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- mkdir -p /tmp/gatling-perf-tests-${CLASS}/results
+
     # run gatling test for a simulation and pass relevant params
-    docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${CLASS}/results -nr || echo "Current Simulation Ended!!"
+    docker exec -d kubectl_support kubectl exec -n jenkins gatling-solr -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${CLASS}/results -nr || echo "Current Simulation Ended!!"
+
+    IF_CMD_EXEC=`docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- ps | grep "gatling" | wc -l`
+    while [ "${IF_CMD_EXEC}" != "0" ]
+    do
+        sleep 10
+        IF_CMD_EXEC=`docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- ps | grep "gatling" | wc -l`
+    done
+
     # generate the reports
     docker exec kubectl_support kubectl exec -n jenkins gatling-solr -- gatling.sh -ro /tmp/gatling-perf-tests-${CLASS}/
     # copy the perf tests to the workspace
     mkdir -p workspace/reports-${CLASS}-${BUILD_NUMBER}
     docker exec kubectl_support mkdir -p /opt/reports-${CLASS}
-    docker exec kubectl_support kubectl cp jenkins/gatling-solr:/tmp/gatling-perf-tests-${CLASS}/ /opt/reports-${CLASS}
+    docker exec kubectl_support kubectl cp jenkins/gatling-solr:/tmp/gatling-perf-tests-${CLASS} /opt/reports-${CLASS}/
     docker cp ${CID}:/opt/reports-${CLASS} ./workspace/reports-${CLASS}-${BUILD_NUMBER}
 
 done <<< "${SIMULATION_CLASS}"
