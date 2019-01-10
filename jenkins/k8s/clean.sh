@@ -16,7 +16,7 @@ if [ ! -z "${CID}" ]; then
     while [ "${PODS_STATUS}" != "No resources found." ]
     do
         sleep 30
-        PODS_STATUS=echo `kubectl get pods --namespace=jenkins`
+        PODS_STATUS=echo `docker exec kubectl_support kubectl get pods --namespace=jenkins`
     done
 fi
 
