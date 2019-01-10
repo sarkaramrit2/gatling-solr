@@ -51,7 +51,7 @@ spec:
     matchLabels:
       app: solr-dummy-cluster
   serviceName: solr-hs-dummy-cluster
-  replicas: 2
+  replicas: 1
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: Parallel
