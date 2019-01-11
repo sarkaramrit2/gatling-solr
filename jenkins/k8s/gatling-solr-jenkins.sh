@@ -73,15 +73,11 @@ if [ ! -z "${REMOTE_INDEX_FILE_PATH}" ]; then
     IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- ps | grep "curl" | wc -l`
     while [ "${IF_CMD_EXEC}" != "0" ]
     do
-      sleep 20
+      sleep 10
       IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- ps | grep "curl" | wc -l`
       done
   done
-
-else
-  rm -rf ./INDEX_PROP_FILE ./workspace/configs/index.config.properties
 fi
-
 
 # so we're requiring INDEX_PROP_FILE (instead of index.config.properties) so bash can read the ENV var
 if [ ! -z "${INDEX_PROP_FILE}" ]; then
