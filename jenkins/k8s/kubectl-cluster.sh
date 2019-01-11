@@ -6,7 +6,7 @@ if [ -z "${GCP_KEY_FILE}" ]; then echo "GCP_KEY_FILE must be non-blank" && exit 
 set -e
 set -x
 
-docker run -it -d --rm --name kubectl_support sarkaramrit2/kubectl-support
+docker run -it -d --rm --name kubectl_support sarkaramrit2/kubectl-support:latest
 # set container id in which the docker is running
 CID=`docker container ls -aq -f "name=kubectl_support"`
 
