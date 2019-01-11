@@ -9,9 +9,10 @@ set -x
 JOB_DESCRIPTION="${SIMULATION_CLASS}"
 
 # Create appropriate directories under workspace
-mkdir -p ./workspace/configs
+
 mkdir -p ./workspace/data
 mkdir -p ./workspace/simulations
+mkdir -p ./workspace/configs
 
 GATLING_NODES=$((NUM_GATLING_NODES + 0))
 
@@ -37,7 +38,7 @@ if [ ! -z "${CLUSTER_YAML_FILE}" ]; then
   # copy the configs from local to dockers
   docker cp ./workspace/configs/${CLUSTER_YAML_FILE} ${CID}:/opt/cluster.yaml
 else
-  rm -rf ./CLUSTER_YAML_FILE ./workspace/configs/${CLUSTER_YAML_FILE}
+  rm -rf ./CLUSTER_YAML_FILE
 fi
 
 docker exec kubectl-support kubectl create -f /opt/cluster.yaml
@@ -73,7 +74,7 @@ if [ ! -z "${INDEX_PROP_FILE}" ]; then
     docker exec kubectl-support kubectl cp /opt/index.config.properties jenkins/gatling-solr-${c}:/opt/gatling/user-files/configs/index.config.properties
   done
 else
-  rm -rf ./INDEX_PROP_FILE ./workspace/configs/index.config.properties
+  rm -rf ./INDEX_PROP_FILE
 fi
 
 # we're requiring QUERY_PROP_FILE (instead of query.config.properties) so bash can read the ENV var
@@ -91,11 +92,7 @@ if [ ! -z "${QUERY_PROP_FILE}" ]; then
     docker exec kubectl-support kubectl cp /opt/query.config.properties jenkins/gatling-solr-${c}:/opt/gatling/user-files/configs/query.config.properties
   done
 else
-  rm -rf ./QUERY_PROP_FILE ./workspace/configs/query.config.properties
-fi
-
-if [ -z "${INDEX_PROP_FILE}" -a  -z "${QUERY_PROP_FILE}" ]; then
-    rm -rf ./workspace/configs
+  rm -rf ./QUERY_PROP_FILE
 fi
 
 # we're requiring DATA_FILE (instead of actual file name) so bash can read the ENV var
@@ -113,7 +110,7 @@ if [ ! -z "${DATA_FILE}" ]; then
     docker exec kubectl-support kubectl cp /opt/${DATA_FILE} jenkins/gatling-solr-${c}:/opt/gatling/user-files/data/${DATA_FILE}
   done
 else
-  rm -rf ./DATA_FILE ./workspace/data/${DATA_FILE}
+  rm -rf ./DATA_FILE
 fi
 
 # we're requiring SIMULATION_FILE so bash can read the ENV var
@@ -131,7 +128,7 @@ if [ ! -z "${SIMULATION_FILE}" ]; then
     docker exec kubectl-support kubectl cp /opt/${SIMULATION_FILE} jenkins/gatling-solr-${c}:/opt/gatling/user-files/simulations/${SIMULATION_FILE}
   done
 else
-  rm -rf ./SIMULATION_FILE ./workspace/simulations/${SIMULATION_FILE}
+  rm -rf ./SIMULATION_FILE
 fi
 
 # so we're requiring REMOTE_INDEX_FILE_PATH so bash can read the ENV var
