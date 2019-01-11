@@ -58,28 +58,7 @@ docker exec kubectl-support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt
 
 # optional property files a user may have uploaded to jenkins
 # Note: Jenkins uses the same string for the file name, and the ENV var,
-
-# so we're requiring REMOTE_INDEX_FILE_PATH so bash can read the ENV var
-if [ ! -z "${REMOTE_INDEX_FILE_PATH}" ]; then
-  # download the remote indexing file
-  for (( c=0; c<${GATLING_NODES}; c++ ))
-  do
-     docker exec -d kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- curl "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/enwiki.random.lines.csv
-  done
-
-  # wait until index file copies to all gatling nodes
-  for (( c=0; c<${GATLING_NODES}; c++ ))
-    do
-    IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- ps | grep "curl" | wc -l`
-    while [ "${IF_CMD_EXEC}" != "0" ]
-    do
-      sleep 10
-      IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- ps | grep "curl" | wc -l`
-      done
-  done
-fi
-
-# so we're requiring INDEX_PROP_FILE (instead of index.config.properties) so bash can read the ENV var
+# so we're requiring INDEX_PROP_FILE (instead of query.config.properties) so bash can read the ENV var
 if [ ! -z "${INDEX_PROP_FILE}" ]; then
   if  [ ! -f ./INDEX_PROP_FILE ]; then
     echo "Found ENV{INDEX_PROP_FILE}=${INDEX_PROP_FILE} -- but ./INDEX_PROP_FILE not found, jenkins bug?" && exit -1;
@@ -153,6 +132,26 @@ if [ ! -z "${SIMULATION_FILE}" ]; then
   done
 else
   rm -rf ./SIMULATION_FILE ./workspace/simulations/${SIMULATION_FILE}
+fi
+
+# so we're requiring REMOTE_INDEX_FILE_PATH so bash can read the ENV var
+if [ ! -z "${REMOTE_INDEX_FILE_PATH}" ]; then
+  # download the remote indexing file
+  for (( c=0; c<${GATLING_NODES}; c++ ))
+  do
+     docker exec -d kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- curl "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/enwiki.random.lines.csv
+  done
+
+  # wait until index file copies to all gatling nodes
+  for (( c=0; c<${GATLING_NODES}; c++ ))
+    do
+    IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- ps | grep "curl" | wc -l`
+    while [ "${IF_CMD_EXEC}" != "0" ]
+    do
+      sleep 10
+      IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- ps | grep "curl" | wc -l`
+      done
+  done
 fi
 
 # execute the load test on docker
