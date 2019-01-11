@@ -6,9 +6,9 @@ if [ -z "${GCP_KEY_FILE}" ]; then echo "GCP_KEY_FILE must be non-blank" && exit 
 set -e
 set -x
 
-docker run -it -d --rm --name kubectl_support sarkaramrit2/kubectl-support:latest
+docker run -it -d --rm --name kubectl-support sarkaramrit2/kubectl-support:latest
 # set container id in which the docker is running
-CID=`docker container ls -aq -f "name=kubectl_support"`
+CID=`docker container ls -aq -f "name=kubectl-support"`
 
 if [ ! -z "${GCP_KEY_FILE}" ]; then
   if  [ ! -f ./GCP_KEY_FILE ]; then
@@ -23,9 +23,9 @@ fi
 # delete the GCP file
 rm -rf ./GCP_KEY_FILE
 
-docker exec kubectl_support gcloud auth activate-service-account --key-file /opt/${GCP_KEY_FILE}
-docker exec kubectl_support gcloud config get-value core/account
-docker exec kubectl_support gcloud config set project strange-team-223300
-docker exec kubectl_support gcloud config set compute/zone us-central1-a
-docker exec kubectl_support gcloud config list
-docker exec kubectl_support gcloud container clusters get-credentials solr-cluster
+docker exec kubectl-support gcloud auth activate-service-account --key-file /opt/${GCP_KEY_FILE}
+docker exec kubectl-support gcloud config get-value core/account
+docker exec kubectl-support gcloud config set project strange-team-223300
+docker exec kubectl-support gcloud config set compute/zone us-central1-a
+docker exec kubectl-support gcloud config list
+docker exec kubectl-support gcloud container clusters get-credentials solr-cluster
