@@ -5,6 +5,8 @@ MAINTAINER Amrit Sarkar <sarkaramrit2@gmail.com>
 # working directory for jenkins load testing
 WORKDIR /opt
 
+ENV GATLING_VERSION=3.0.0
+
 # Install gcloud, kubectl
 RUN \
     export CLOUD_SDK_REPO="cloud-sdk" && \
@@ -15,12 +17,14 @@ RUN \
 
 # install gatling
 RUN apt-get install wget bash && \
-  wget -q -O /tmp/downloads/gatling-$GATLING_VERSION.zip \
-  https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/$GATLING_VERSION/gatling-charts-highcharts-bundle-$GATLING_VERSION-bundle.zip && \
+  mkdir -p /tmp/downloads/ && \
+  wget -q -O /tmp/downloads/gatling-${GATLING_VERSION}.zip \
+  https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/${GATLING_VERSION}/gatling-charts-highcharts-bundle-${GATLING_VERSION}-bundle.zip && \
   mkdir -p /tmp/archive && cd /tmp/archive && \
-  unzip /tmp/downloads/gatling-$GATLING_VERSION.zip && \
+  unzip /tmp/downloads/gatling-${GATLING_VERSION}.zip && \
   mkdir -p /opt/gatling/ && \
-  mv /tmp/archive/gatling-charts-highcharts-bundle-$GATLING_VERSION/* /opt/gatling/
+  mv /tmp/archive/gatling-charts-highcharts-bundle-${GATLING_VERSION}/* /opt/gatling/ && \
+  rm -rf /tmp/*
 
 # set environment variables
 ENV PATH /opt/gatling/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
