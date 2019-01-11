@@ -298,30 +298,41 @@ spec:
           storage: "10Gi"
 
 ---
-apiVersion: apps/v1
-kind: ReplicaSet
+apiVersion: v1
+kind: Service
 metadata:
   name: gatling-solr
   namespace: jenkins
   labels:
-    app: Job
-    tier: gatling-solr
+    app: gatling-solr
 spec:
-  # modify replicas according to your case
-  replicas: 2
+  ports:
+  - port: 80
+    name: gatling-solr
+  clusterIP: None
+  selector:
+    app: gatling-solr
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gatling-solr
+  namespace: jenkins
+spec:
   selector:
     matchLabels:
-      tier: gatling-solr
-    matchExpressions:
-    - {key: tier, operator: In, values: [gatling-solr]}
+      app: gatling-solr # has to match .spec.template.metadata.labels
+  serviceName: "gatling-solr"
+  replicas: 2 # by default is 1
   template:
     metadata:
       labels:
-        app: Job
-        tier: gatling-solr
+        app: gatling-solr # has to match .spec.selector.matchLabels
     spec:
+      terminationGracePeriodSeconds: 10
       containers:
       - name: gatling-solr
         image: sarkaramrit2/gatling-solr:latest
         ports:
         - containerPort: 80
+          name: gatling-solr
