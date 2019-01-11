@@ -44,7 +44,7 @@ docker exec kubectl-support kubectl create -f /opt/cluster.yaml
 # wait until all pods comes up running
 TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
 # find better way to determine all pods running
-while [ "${TOTAL_PODS}" != "${ESTIMATED_NODES_1}" -o "${TOTAL_PODS}" != "${ESTIMATED_NODES_2}" ]
+while [ "${TOTAL_PODS}" != "${ESTIMATED_NODES_1}" -a "${TOTAL_PODS}" != "${ESTIMATED_NODES_2}" ]
 do
    sleep 30
    TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
