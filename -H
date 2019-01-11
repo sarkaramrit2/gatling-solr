@@ -1,0 +1,3 @@
+--_curl_--"kind":"DeleteOptions"
+--_curl_--"apiVersion":"v1"
+--_curl_--"propagationPolicy":"Foreground"
