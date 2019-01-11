@@ -61,10 +61,6 @@ docker exec kubectl-support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt
 
 # so we're requiring REMOTE_INDEX_FILE_PATH so bash can read the ENV var
 if [ ! -z "${REMOTE_INDEX_FILE_PATH}" ]; then
-  if  [ ! -f ./REMOTE_INDEX_FILE_PATH ]; then
-    echo "Found ENV{REMOTE_INDEX_FILE_PATH}=${REMOTE_INDEX_FILE_PATH} -- but ./REMOTE_INDEX_FILE_PATH not found, jenkins bug?" && exit -1;
-  fi
-
   # download the remote indexing file
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
