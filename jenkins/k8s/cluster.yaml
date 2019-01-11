@@ -299,9 +299,10 @@ spec:
 
 ---
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: StatefulSet
 metadata:
   name: gatling-solr
+  namespace: jenkins
   labels:
     app: Job
     tier: gatling-solr
