@@ -145,7 +145,7 @@ while read -r CLASS; do
     # generate the reports
     for (( c=0; c<$GATLING_NODES; c++ ))
     do
-        docker exec kubectl-support kubectl exec -n jenkins gatling-solr -- gatling.sh -ro /tmp/gatling-perf-tests-${c}-${CLASS}/
+        docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- gatling.sh -ro /tmp/gatling-perf-tests-${c}-${CLASS}/
         # copy the perf tests to the workspace
         mkdir -p workspace/reports-${c}-${CLASS}-${BUILD_NUMBER}
         docker exec kubectl-support mkdir -p /opt/reports-${c}-${CLASS}
