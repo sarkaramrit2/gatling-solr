@@ -48,9 +48,9 @@ if [ ! -z "${INDEX_PROP_FILE}" ]; then
 
   # copy the configs from local to dockers
   docker cp ./workspace/configs/index.config.properties ${CID}:/opt/index.config.properties
-  for (( c=0; c<$GATLING_NODES; c++ ))
+  for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-    docker exec kubectl-support kubectl cp /opt/index.config.properties jenkins/gatling-solr-$c:/opt/gatling/user-files/configs/index.config.properties
+    docker exec kubectl-support kubectl cp /opt/index.config.properties jenkins/gatling-solr-${c}:/opt/gatling/user-files/configs/index.config.properties
   done
 else
   rm -rf ./INDEX_PROP_FILE ./workspace/configs/index.config.properties
@@ -66,9 +66,9 @@ if [ ! -z "${QUERY_PROP_FILE}" ]; then
 
   # copy the configs from local to dockers
   docker cp ./workspace/configs/query.config.properties ${CID}:/opt/query.config.properties
-  for (( c=0; c<$GATLING_NODES; c++ ))
+  for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-    docker exec kubectl-support kubectl cp /opt/query.config.properties jenkins/gatling-solr-$c:/opt/gatling/user-files/configs/query.config.properties
+    docker exec kubectl-support kubectl cp /opt/query.config.properties jenkins/gatling-solr-${c}:/opt/gatling/user-files/configs/query.config.properties
   done
 else
   rm -rf ./QUERY_PROP_FILE ./workspace/configs/query.config.properties
@@ -88,9 +88,9 @@ if [ ! -z "${DATA_FILE}" ]; then
 
   # copy the data from local to dockers
   docker cp ./workspace/configs/${DATA_FILE} ${CID}:/opt/${DATA_FILE}
-  for (( c=0; c<$GATLING_NODES; c++ ))
+  for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-    docker exec kubectl-support kubectl cp /opt/${DATA_FILE} jenkins/gatling-solr-$c:/opt/gatling/user-files/data/${DATA_FILE}
+    docker exec kubectl-support kubectl cp /opt/${DATA_FILE} jenkins/gatling-solr-${c}:/opt/gatling/user-files/data/${DATA_FILE}
   done
 else
   rm -rf ./DATA_FILE ./workspace/data/${DATA_FILE}
@@ -106,9 +106,9 @@ if [ ! -z "${SIMULATION_FILE}" ]; then
 
   # copy the simulation file from local to dockers
   docker cp ./workspace/simulations/${SIMULATION_FILE} ${CID}:/opt/${SIMULATION_FILE}
-  for (( c=0; c<$GATLING_NODES; c++ ))
+  for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-    docker exec kubectl-support kubectl cp /opt/${SIMULATION_FILE} jenkins/gatling-solr-$c:/opt/gatling/user-files/simulations/${SIMULATION_FILE}
+    docker exec kubectl-support kubectl cp /opt/${SIMULATION_FILE} jenkins/gatling-solr-${c}:/opt/gatling/user-files/simulations/${SIMULATION_FILE}
   done
 else
   rm -rf ./SIMULATION_FILE ./workspace/simulations/${SIMULATION_FILE}
@@ -121,18 +121,18 @@ echo "JOB DESCRIPTION: running....."
 while read -r CLASS; do
 
     # create results directory on the docker
-    for (( c=0; c<$GATLING_NODES; c++ ))
+    for (( c=0; c<${GATLING_NODES}; c++ ))
     do
       docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- mkdir -p /tmp/gatling-perf-tests-${c}-${CLASS}/results
     done
 
     # run gatling test for a simulation and pass relevant params
-    for (( c=0; c<$GATLING_NODES; c++ ))
+    for (( c=0; c<${GATLING_NODES}; c++ ))
     do
       docker exec -d kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
     done
 
-    for (( c=0; c<$GATLING_NODES; c++ ))
+    for (( c=0; c<${GATLING_NODES}; c++ ))
     do
         IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- ps | grep "gatling" | wc -l`
         while [ "${IF_CMD_EXEC}" != "0" ]
@@ -143,13 +143,13 @@ while read -r CLASS; do
     done
 
     # generate the reports
-    for (( c=0; c<$GATLING_NODES; c++ ))
+    for (( c=0; c<${GATLING_NODES}; c++ ))
     do
         docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- gatling.sh -ro /tmp/gatling-perf-tests-${c}-${CLASS}/
         # copy the perf tests to the workspace
         mkdir -p workspace/reports-${c}-${CLASS}-${BUILD_NUMBER}
         docker exec kubectl-support mkdir -p /opt/reports-${c}-${CLASS}
-        docker exec kubectl-support kubectl cp jenkins/gatling-solr:/tmp/gatling-perf-tests-${c}-${CLASS} /opt/reports-${c}-${CLASS}/
+        docker exec kubectl-support kubectl cp jenkins/gatling-solr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS} /opt/reports-${c}-${CLASS}/
         docker cp ${CID}:/opt/reports-${c}-${CLASS} ./workspace/reports-${c}-${CLASS}-${BUILD_NUMBER}
     done
 
