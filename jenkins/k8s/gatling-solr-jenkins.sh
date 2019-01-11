@@ -9,9 +9,9 @@ set -x
 JOB_DESCRIPTION="${SIMULATION_CLASS}"
 
 # Create appropriate directories under workspace
-mkdir -p workspace/configs
-mkdir -p workspace/data
-mkdir -p workspace/simulations
+mkdir -p ./workspace/configs
+mkdir -p ./workspace/data
+mkdir -p ./workspace/simulations
 
 GATLING_NODES=$((NUM_GATLING_NODES + 0))
 
@@ -58,7 +58,7 @@ docker exec kubectl-support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt
 
 # optional property files a user may have uploaded to jenkins
 # Note: Jenkins uses the same string for the file name, and the ENV var,
-# so we're requiring INDEX_PROP_FILE (instead of query.config.properties) so bash can read the ENV var
+# so we're requiring INDEX_PROP_FILE (instead of index.config.properties) so bash can read the ENV var
 if [ ! -z "${INDEX_PROP_FILE}" ]; then
   if  [ ! -f ./INDEX_PROP_FILE ]; then
     echo "Found ENV{INDEX_PROP_FILE}=${INDEX_PROP_FILE} -- but ./INDEX_PROP_FILE not found, jenkins bug?" && exit -1;
