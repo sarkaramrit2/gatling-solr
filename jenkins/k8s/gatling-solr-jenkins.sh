@@ -15,6 +15,9 @@ mkdir -p workspace/simulations
 
 GATLING_NODES=$((NUM_GATLING_NODES + 0))
 
+# 5 more nodes for solr cluster
+ESTIMATED_NODES=$((GATLING_NODES + 5))
+
 CID=`docker container ls -aq -f "name=kubectl-support"`
 
 # initialise the k8s cluster with zookeepers, solr clusters, gatling-solr image
@@ -40,7 +43,7 @@ docker exec kubectl-support kubectl create -f /opt/cluster.yaml
 # wait until all pods comes up running
 TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
 # find better way to determine all pods running
-while [ "${TOTAL_PODS}" != "7" ]
+while [ "${TOTAL_PODS}" != "${ESTIMATED_NODES}" ]
 do
    sleep 30
    TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
@@ -159,14 +162,17 @@ while read -r CLASS; do
     done
 
     # generate the reports
-    for (( c=0; c<${GATLING_NODES}; c++ ))
+    for (( c=1; c<${GATLING_NODES}; c++ ))
     do
-        docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- gatling.sh -ro /tmp/gatling-perf-tests-${c}-${CLASS}/
-        # copy the perf tests to the workspace
-        mkdir -p workspace/reports-${c}-${CLASS}-${BUILD_NUMBER}
-        docker exec kubectl-support mkdir -p /opt/reports-${c}-${CLASS}
-        docker exec kubectl-support kubectl cp jenkins/gatling-solr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS} /opt/reports-${c}-${CLASS}/
-        docker cp ${CID}:/opt/reports-${c}-${CLASS} ./workspace/reports-${c}-${CLASS}-${BUILD_NUMBER}
+        docker exec kubectl-support kubectl cp jenkins/gatling-solr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS}/results/* jenkins/gatling-solr-0:/tmp/gatling-perf-tests-0-${CLASS}/results/
     done
+
+    docker exec kubectl-support kubectl exec -n jenkins gatling-solr-0 -- gatling.sh -ro /tmp/gatling-perf-tests-0-${CLASS}/
+    # copy the perf tests to the workspace
+    mkdir -p workspace/reports-${CLASS}-${BUILD_NUMBER}
+    docker exec kubectl-support mkdir -p /opt/reports-0-${CLASS}
+    docker exec kubectl-support kubectl cp jenkins/gatling-solr-0:/tmp/gatling-perf-tests-0-${CLASS} /opt/reports-0-${CLASS}/
+    docker cp ${CID}:/opt/reports-${c}-${CLASS} ./workspace/reports-${CLASS}-${BUILD_NUMBER}
+
 
 done <<< "${SIMULATION_CLASS}"
