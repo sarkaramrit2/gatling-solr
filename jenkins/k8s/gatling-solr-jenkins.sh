@@ -13,11 +13,30 @@ mkdir -p workspace/configs
 mkdir -p workspace/data
 mkdir -p workspace/simulations
 
+GATLING_NODES=$((NUM_GATLING_NODES + 0))
+
 CID=`docker container ls -aq -f "name=kubectl-support"`
 
 # initialise the k8s cluster with zookeepers, solr clusters, gatling-solr image
-docker exec kubectl-support wget https://raw.githubusercontent.com/sarkaramrit2/gatling-solr/master/jenkins/k8s/cluster.yaml
-docker exec kubectl-support kubectl create -f ./cluster.yaml
+sed -i "s/gatling-nodes-replicas/${GATLING_NODES}/" ./jenkins/k8s/cluster.yaml
+docker cp ./jenkins/k8s/cluster.yaml ${CID}:/opt/cluster.yaml
+# optional property files a user may have uploaded to jenkins
+# Note: Jenkins uses the same string for the file name, and the ENV var,
+# so we're requiring CLUSTER_YAML_FILE (instead of cluster.yaml) so bash can read the ENV var
+if [ ! -z "${CLUSTER_YAML_FILE}" ]; then
+  if  [ ! -f ./CLUSTER_YAML_FILE ]; then
+    echo "Found ENV{CLUSTER_YAML_FILE}=${CLUSTER_YAML_FILE} -- but ./CLUSTER_YAML_FILE not found, jenkins bug?" && exit -1;
+  fi
+  echo "Copying user supplied index config to workspace/configs/index.config.properties"
+  cp ./CLUSTER_YAML_FILE ./workspace/configs/${CLUSTER_YAML_FILE}
+
+  # copy the configs from local to dockers
+  docker cp ./workspace/configs/${CLUSTER_YAML_FILE} ${CID}:/opt/cluster.yaml
+else
+  rm -rf ./CLUSTER_YAML_FILE ./workspace/configs/${CLUSTER_YAML_FILE}
+fi
+
+docker exec kubectl-support kubectl create -f /opt/cluster.yaml
 # wait until all pods comes up running
 TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
 # find better way to determine all pods running
@@ -32,9 +51,6 @@ docker cp ./jenkins/collection-config ${CID}:/opt/collection-config
 docker exec kubectl-support kubectl cp /opt/collection-config jenkins/solr-dummy-cluster-0:/opt/solr/collection-config
 docker exec kubectl-support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
 docker exec kubectl-support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s 2 -rf 2 -d /opt/solr/collection-config/
-
-
-GATLING_NODES=2
 
 # optional property files a user may have uploaded to jenkins
 # Note: Jenkins uses the same string for the file name, and the ENV var,

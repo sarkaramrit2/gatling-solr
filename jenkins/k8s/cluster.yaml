@@ -323,7 +323,7 @@ spec:
     matchLabels:
       app: gatling-solr # has to match .spec.template.metadata.labels
   serviceName: "gatling-solr"
-  replicas: 2 # by default is 1
+  replicas: gatling-nodes-replicas # by default is 1
   template:
     metadata:
       labels:
