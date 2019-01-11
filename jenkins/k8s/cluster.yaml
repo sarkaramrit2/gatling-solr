@@ -298,17 +298,29 @@ spec:
           storage: "10Gi"
 
 ---
-# Source: solr-base/templates/gatling-solr.yaml
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: ReplicaSet
 metadata:
   name: gatling-solr
-  namespace: jenkins
   labels:
-    app: job
+    app: Job
+    tier: gatling-solr
 spec:
-  containers:
-  - name: gatling-solr
-    image: sarkaramrit2/gatling-solr:latest
-    ports:
-    - containerPort: 80
+  # modify replicas according to your case
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: gatling-solr
+    matchExpressions:
+    - {key: tier, operator: In, values: [gatling-solr]}
+  template:
+    metadata:
+      labels:
+        app: Job
+        tier: gatling-solr
+    spec:
+      containers:
+      - name: gatling-solr
+        image: sarkaramrit2/gatling-solr:latest
+        ports:
+        - containerPort: 80
