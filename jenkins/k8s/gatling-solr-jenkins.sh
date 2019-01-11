@@ -162,17 +162,16 @@ while read -r CLASS; do
     done
 
     # generate the reports
-    for (( c=1; c<${GATLING_NODES}; c++ ))
+    for (( c=0; c<${GATLING_NODES}; c++ ))
     do
-        docker exec kubectl-support kubectl cp jenkins/gatling-solr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS}/results/* jenkins/gatling-solr-0:/tmp/gatling-perf-tests-0-${CLASS}/results/
+        docker exec kubectl-support mkdir -p /opt/results/reports-${c}-${CLASS}
+        docker exec kubectl-support kubectl cp jenkins/gatling-solr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS}/results/ /opt/results/reports-${c}-${CLASS}/
     done
 
-    docker exec kubectl-support kubectl exec -n jenkins gatling-solr-0 -- gatling.sh -ro /tmp/gatling-perf-tests-0-${CLASS}/
+    docker exec kubectl-support gatling.sh -ro /opt/results/
     # copy the perf tests to the workspace
     mkdir -p workspace/reports-${CLASS}-${BUILD_NUMBER}
-    docker exec kubectl-support mkdir -p /opt/reports-0-${CLASS}
-    docker exec kubectl-support kubectl cp jenkins/gatling-solr-0:/tmp/gatling-perf-tests-0-${CLASS} /opt/reports-0-${CLASS}/
-    docker cp ${CID}:/opt/reports-${c}-${CLASS} ./workspace/reports-${CLASS}-${BUILD_NUMBER}
-
+    docker cp ${CID}:/opt/results ./workspace/reports-${CLASS}-${BUILD_NUMBER}
+    docker exec kubectl-support rm -rf /opt/results/
 
 done <<< "${SIMULATION_CLASS}"
