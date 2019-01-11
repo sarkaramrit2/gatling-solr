@@ -171,8 +171,8 @@ while read -r CLASS; do
 
     docker exec kubectl-support gatling.sh -ro /opt/results/
     # copy the perf tests to the workspace
-    mkdir -p workspace/reports-${CLASS}-${BUILD_NUMBER}
-    docker cp ${CID}:/opt/results ./workspace/reports-${CLASS}-${BUILD_NUMBER}
+    mkdir -p workspace/reports-${BUILD_NUMBER}/${CLASS}
+    docker cp ${CID}:/opt/results ./workspace/reports-${BUILD_NUMBER}/${CLASS}
     docker exec kubectl-support rm -rf /opt/results/
 
 done <<< "${SIMULATION_CLASS}"
