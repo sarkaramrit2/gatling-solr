@@ -16,8 +16,8 @@ mkdir -p workspace/simulations
 CID=`docker container ls -aq -f "name=kubectl-support"`
 
 # initialise the k8s cluster with zookeepers, solr clusters, gatling-solr image
-docker exec kubectl-support cd /opt/ && wget https://raw.githubusercontent.com/sarkaramrit2/gatling-solr/master/jenkins/k8s/cluster.yaml
-docker exec kubectl-support kubectl create -f /opt/cluster.yaml
+docker exec kubectl-support wget https://raw.githubusercontent.com/sarkaramrit2/gatling-solr/master/jenkins/k8s/cluster.yaml
+docker exec kubectl-support kubectl create -f /cluster.yaml
 # wait until all pods comes up running
 TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
 while [ "${TOTAL_PODS}" != "6" ]
