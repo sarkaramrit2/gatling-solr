@@ -1,13 +1,11 @@
 import java.io.{File, FileReader}
-import java.util
 import java.util.{Properties, Scanner}
 
 import com.lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
-import org.apache.solr.common.SolrInputDocument
 
-class IndexV2Simulation extends Simulation {
+class IndexV1Simulation extends Simulation {
 
   object Config {
 
@@ -19,7 +17,7 @@ class IndexV2Simulation extends Simulation {
     prop.load(propFile)
 
     val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
-      "data/enwiki.random.lines.sample.csv")
+      "data/enwiki.random.lines.csv")
     val numBatchesPerUser = prop.getProperty("numBatchesPerUser", "200")
     val maxNumUsers = prop.getProperty("maxNumUsers", "2")
     val minNumUsers = prop.getProperty("minNumUsers", "1")
@@ -28,51 +26,42 @@ class IndexV2Simulation extends Simulation {
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
     val defaultCollection = prop.getProperty("defaultCollection", "wiki")
     val header = prop.getProperty("header", "title,time,description")
-    val headerSep = prop.getProperty("header.sep", ",")
-    val fieldValuesSep = prop.getProperty("fieldValues.sep", ",")
     val numClients = prop.getProperty("numClients", "1")
 
   }
 
-  val solrIndexV2Feeder = new Feeder[util.ArrayList[SolrInputDocument]] {
+  val solrIndexFeeder = new Feeder[String] {
 
-    private val indexFile = new File(Config.indexFilePath)
-    private val fileReader = new FileReader(indexFile)
-    private val scanner = new Scanner(fileReader)
+    val indexFile = new File(Config.indexFilePath)
+    var fileReader = new FileReader(indexFile)
+    var scanner = new Scanner(fileReader)
 
     override def hasNext = scanner.hasNext()
 
-    override def next: Map[String, util.ArrayList[SolrInputDocument]] = {
+    override def next: Map[String, String] = {
       var batchSize = Config.indexBatchSize.toInt
-      val records = new util.ArrayList[SolrInputDocument]()
-      while (batchSize > 0 && scanner.hasNext()) {
-        val record = scanner.nextLine()
-        val doc = new SolrInputDocument()
-        val fieldNames = Config.header.split(Config.headerSep) // default comma
-        val fieldValues = record.split(Config.fieldValuesSep) // default comma
-
-        for (i <- 0 until fieldNames.length) {
-          if (fieldValues.length - 1 >= i) {
-            doc.addField(fieldNames(i), fieldValues(i).trim);
-          }
-        }
-        records.add(doc)
+      var record = ""
+      while (batchSize > 0) {
+        record += scanner.nextLine()
         batchSize = batchSize - 1
+        if (batchSize > 0) {
+          record += '\n'
+        }
       }
 
       Map(
-        "record" -> records)
+        "record" -> record)
     }
   }
 
   object Index {
     // construct a feeder for content stored in CSV file
-    val feeder = solrIndexV2Feeder
+    val feeder = solrIndexFeeder
 
     // each user sends batches
     val search = repeat(Config.numBatchesPerUser) {
       feed(feeder).exec(solr("indexRequest")
-        .indexV2(Config.header, feeder.next.get("record").get)) // provide appropriate header
+        .index(Config.header, "${record}")) // provide appropriate header
     }
   }
 
