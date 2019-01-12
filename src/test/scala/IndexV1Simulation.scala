@@ -4,6 +4,7 @@ import java.util.{Properties, Scanner}
 import com.lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
+import org.apache.solr.client.solrj.impl.CloudSolrClient
 
 class IndexV1Simulation extends Simulation {
 
@@ -76,4 +77,8 @@ class IndexV1Simulation extends Simulation {
     users.inject(
       atOnceUsers(Config.maxNumUsers.toInt))
   ).protocols(solrConf)
+
+  val client = new CloudSolrClient.Builder().withZkHost(Config.zkHost).build()
+  client.setDefaultCollection(Config.defaultCollection)
+  client.commit()
 }
