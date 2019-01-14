@@ -89,7 +89,4 @@ class IndexSimulation extends Simulation {
       atOnceUsers(Config.maxNumUsers.toInt))
   ).protocols(solrConf)
 
-  val client = new CloudSolrClient.Builder().withZkHost(Config.zkHost).build()
-  client.setDefaultCollection(Config.defaultCollection)
-  client.commit(false, true)
 }
