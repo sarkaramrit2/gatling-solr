@@ -409,8 +409,8 @@
                       and initialSize parameters are ignored.
       -->
     <filterCache class="solr.FastLRUCache"
-                 size="512"
-                 initialSize="512"
+                 size="0"
+                 initialSize="0"
                  autowarmCount="0"/>
 
     <!-- Query Result Cache
@@ -422,8 +422,8 @@
                        to occupy
       -->
     <queryResultCache class="solr.LRUCache"
-                      size="512"
-                      initialSize="512"
+                      size="0"
+                      initialSize="0"
                       autowarmCount="0"/>
 
     <!-- Document Cache
@@ -433,16 +433,16 @@
          this cache will not be autowarmed.
       -->
     <documentCache class="solr.LRUCache"
-                   size="512"
-                   initialSize="512"
+                   size="0"
+                   initialSize="0"
                    autowarmCount="0"/>
 
     <!-- custom cache currently used by block join -->
     <cache name="perSegFilter"
            class="solr.search.LRUCache"
-           size="10"
+           size="0"
            initialSize="0"
-           autowarmCount="10"
+           autowarmCount="0"
            regenerator="solr.NoOpRegenerator" />
 
     <!-- Field Value Cache
@@ -514,12 +514,12 @@
          then documents 0 through 49 will be collected and cached.  Any further
          requests in that range can be satisfied via the cache.
       -->
-    <queryResultWindowSize>20</queryResultWindowSize>
+    <queryResultWindowSize>0</queryResultWindowSize>
 
     <!-- Maximum number of documents to cache for any entry in the
          queryResultCache.
       -->
-    <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
+    <queryResultMaxDocsCached>0</queryResultMaxDocsCached>
 
     <!-- Query Related Event Listeners
 
