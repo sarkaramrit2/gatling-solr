@@ -194,3 +194,7 @@ while read -r CLASS; do
     docker exec kubectl-support rm -rf /opt/results/
 
 done <<< "${SIMULATION_CLASS}"
+
+# copy the logs to the workspace
+docker exec kubectl-support kubectl cp jenkins/solr-dummy-cluster-0:/opt/solr/logs /opt/solr-logs
+docker cp ${CID}:/opt/solr-logs ./workspace/reports-${BUILD_NUMBER}/solr-logs
