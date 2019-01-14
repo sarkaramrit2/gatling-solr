@@ -80,5 +80,5 @@ class IndexV1Simulation extends Simulation {
 
   val client = new CloudSolrClient.Builder().withZkHost(Config.zkHost).build()
   client.setDefaultCollection(Config.defaultCollection)
-  client.commit()
+  client.commit(false, true)
 }
