@@ -2,6 +2,7 @@ import java.util.Properties
 
 import com.lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
+import org.apache.solr.client.solrj.impl.CloudSolrClient
 
 import scala.concurrent.duration._
 
@@ -38,6 +39,10 @@ class FacetQuerySimulation extends Simulation {
         .query[String](Config.basequery))
     }
   }
+  
+  val client = new CloudSolrClient.Builder().withZkHost(Config.zkHost).build()
+  client.setDefaultCollection(Config.defaultCollection)
+  client.commit(false, true)
 
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
   val solrConf = solr.zkhost(Config.zkHost).collection(Config.defaultCollection)
