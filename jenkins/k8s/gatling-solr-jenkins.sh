@@ -29,9 +29,6 @@ else
    cp ./jenkins/k8s/cluster-external.yaml ./jenkins/k8s/cluster.yaml
 fi
 
-ESTIMATED_NODES_1=$((GATLING_NODES + 5))
-ESTIMATED_NODES_2=$((GATLING_NODES + 6))
-
 CID=`docker container ls -aq -f "name=kubectl-support"`
 
 # initialise the k8s cluster with zookeepers, solr clusters, gatling-solr image
