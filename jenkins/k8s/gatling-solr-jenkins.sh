@@ -56,15 +56,24 @@ docker exec kubectl-support kubectl delete statefulsets gatling-solr --namespace
 docker exec kubectl-support kubectl delete service gatling-solr --namespace=${GCP_K8_CLUSTER_NAMESPACE}
 
 docker exec kubectl-support kubectl create -f /opt/cluster.yaml
-# wait until all pods comes up running
-TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=${GCP_K8_CLUSTER_NAMESPACE} | wc -l`
-# find better way to determine all pods running
 
 if [ "$IMPLICIT_CLUSTER" = true ] ; then
+    # wait until all pods comes up running
+    TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=${GCP_K8_CLUSTER_NAMESPACE} | wc -l`
+    # find better way to determine all pods running
     while [ "${TOTAL_PODS}" != "${ESTIMATED_NODES_1}" -a "${TOTAL_PODS}" != "${ESTIMATED_NODES_2}" ]
     do
        sleep 30
        TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=${GCP_K8_CLUSTER_NAMESPACE} | wc -l`
+    done
+else
+    # wait until all pods comes up running
+    TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector status.phase=Running --field-selector metadata.name=gatling-solr-0 --namespace=${GCP_K8_CLUSTER_NAMESPACE} | wc -l`
+    # find better way to determine all pods running
+    while [ "${TOTAL_PODS}" != "2" ]
+    do
+       sleep 30
+       TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector status.phase=Running --field-selector metadata.name=gatling-solr-0 --namespace=${GCP_K8_CLUSTER_NAMESPACE} | wc -l`
     done
 fi
 
