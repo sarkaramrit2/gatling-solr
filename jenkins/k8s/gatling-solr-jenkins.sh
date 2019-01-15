@@ -52,8 +52,8 @@ else
 fi
 
 # delete gatling-solr service and statefulsets, redundant step
-docker exec kubectl delete statefulsets gatling-solr --namespace=${GCP_K8_CLUSTER_NAMESPACE}
-docker exec kubectl delete service gatling-solr --namespace=${GCP_K8_CLUSTER_NAMESPACE}
+docker exec kubectl-support kubectl delete statefulsets gatling-solr --namespace=${GCP_K8_CLUSTER_NAMESPACE}
+docker exec kubectl-support kubectl delete service gatling-solr --namespace=${GCP_K8_CLUSTER_NAMESPACE}
 
 docker exec kubectl-support kubectl create -f /opt/cluster.yaml
 # wait until all pods comes up running
