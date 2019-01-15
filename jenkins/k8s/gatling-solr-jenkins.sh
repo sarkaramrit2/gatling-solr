@@ -21,6 +21,7 @@ ESTIMATED_NODES_1=$((GATLING_NODES))
 ESTIMATED_NODES_2=$((GATLING_NODES + 1))
 
 if [ "$IMPLICIT_CLUSTER" = true ] ; then
+   # TODO: hardcoded need to provide the check better, possible parameter passing
    ESTIMATED_NODES_1=$((ESTIMATED_NODES_1 + 5))
    ESTIMATED_NODES_2=$((ESTIMATED_NODES_2 + 5))
    cp ./jenkins/k8s/cluster-internal.yaml ./jenkins/k8s/cluster.yaml
