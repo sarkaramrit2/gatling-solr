@@ -17,6 +17,17 @@ mkdir -p ./workspace/configs
 GATLING_NODES=$((NUM_GATLING_NODES + 0))
 
 # 5 more nodes for solr cluster
+ESTIMATED_NODES_1=$((GATLING_NODES))
+ESTIMATED_NODES_2=$((GATLING_NODES + 1))
+
+if [ "$IMPLICIT_CLUSTER" = true ] ; then
+   ESTIMATED_NODES_1=$((ESTIMATED_NODES_1 + 5))
+   ESTIMATED_NODES_2=$((ESTIMATED_NODES_2 + 5))
+   cp ./jenkins/k8s/cluster-internal.yaml ./jenkins/k8s/cluster.yaml
+else
+   cp ./jenkins/k8s/cluster-external.yaml ./jenkins/k8s/cluster.yaml
+fi
+
 ESTIMATED_NODES_1=$((GATLING_NODES + 5))
 ESTIMATED_NODES_2=$((GATLING_NODES + 6))
 
@@ -51,11 +62,13 @@ do
    TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
 done
 
-# (re)create collection 'wiki' with shards 2 replicas 2
-docker cp ./jenkins/collection-config ${CID}:/opt/collection-config
-docker exec kubectl-support kubectl cp /opt/collection-config jenkins/solr-dummy-cluster-0:/opt/solr/collection-config
-docker exec kubectl-support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
-docker exec kubectl-support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s 2 -rf 2 -d /opt/solr/collection-config/
+if [ "$IMPLICIT_CLUSTER" = true ] ; then
+    # (re)create collection 'wiki' with shards 2 replicas 2
+    docker cp ./jenkins/collection-config ${CID}:/opt/collection-config
+    docker exec kubectl-support kubectl cp /opt/collection-config jenkins/solr-dummy-cluster-0:/opt/solr/collection-config
+    docker exec kubectl-support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
+    docker exec kubectl-support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s 2 -rf 2 -d /opt/solr/collection-config/
+fi
 
 # optional property files a user may have uploaded to jenkins
 # Note: Jenkins uses the same string for the file name, and the ENV var,
@@ -213,6 +226,8 @@ while read -r CLASS; do
 
 done <<< "${SIMULATION_CLASS}"
 
-# copy the logs to the workspace
-docker exec kubectl-support kubectl cp jenkins/solr-dummy-cluster-0:/opt/solr/logs /opt/solr-logs
-docker cp ${CID}:/opt/solr-logs ./workspace/reports-${BUILD_NUMBER}/solr-logs
+if [ "$IMPLICIT_CLUSTER" = true ] ; then
+    # copy the logs to the workspace
+    docker exec kubectl-support kubectl cp jenkins/solr-dummy-cluster-0:/opt/solr/logs /opt/solr-logs
+    docker cp ${CID}:/opt/solr-logs ./workspace/reports-${BUILD_NUMBER}/solr-logs
+fi

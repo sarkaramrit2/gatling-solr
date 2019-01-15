@@ -1,0 +1,45 @@
+---
+# Source: solr-base/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jenkins
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gatling-solr
+  namespace: jenkins
+  labels:
+    app: gatling-solr
+spec:
+  ports:
+  - port: 80
+    name: gatling-solr
+  clusterIP: None
+  selector:
+    app: gatling-solr
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gatling-solr
+  namespace: jenkins
+spec:
+  selector:
+    matchLabels:
+      app: gatling-solr # has to match .spec.template.metadata.labels
+  serviceName: "gatling-solr"
+  replicas: gatling-nodes-replicas # by default is 1
+  template:
+    metadata:
+      labels:
+        app: gatling-solr # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: gatling-solr
+        image: sarkaramrit2/gatling-solr:latest
+        ports:
+        - containerPort: 80
+          name: gatling-solr
