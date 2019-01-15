@@ -56,6 +56,8 @@ docker exec kubectl-support kubectl delete statefulsets gatling-solr --namespace
 docker exec kubectl-support kubectl delete service gatling-solr --namespace=${GCP_K8_CLUSTER_NAMESPACE}
 
 docker exec kubectl-support kubectl create -f /opt/cluster.yaml
+# buffer sleep for 30 sec to get the pods ready, and then check
+sleep 30
 
 if [ "$IMPLICIT_CLUSTER" = true ] ; then
     # wait until all pods comes up running
