@@ -95,22 +95,40 @@ else
   rm -rf ./QUERY_PROP_FILE
 fi
 
-# we're requiring DATA_FILE (instead of actual file name) so bash can read the ENV var
-if [ ! -z "${DATA_FILE}" ]; then
-  if  [ ! -f ./DATA_FILE ]; then
-    echo "Found ENV{DATA_FILE}=${DATA_FILE} -- but ./DATA_FILE not found, jenkins bug?" && exit -1;
+# we're requiring INDEX_FEEDER_FILE (instead of actual file name) so bash can read the ENV var
+if [ ! -z "${INDEX_FEEDER_FILE}" ]; then
+  if  [ ! -f ./INDEX_FEEDER_FILE ]; then
+    echo "Found ENV{INDEX_FEEDER_FILE}=${INDEX_FEEDER_FILE} -- but ./INDEX_FEEDER_FILE not found, jenkins bug?" && exit -1;
   fi
-  echo "Copying user supplied patch to workspace/data/${DATA_FILE}"
-  cp ./DATA_FILE ./workspace/data/${DATA_FILE}
+  echo "Copying user supplied patch to workspace/data/${INDEX_FEEDER_FILE}"
+  cp ./INDEX_FEEDER_FILE ./workspace/data/${INDEX_FEEDER_FILE}
 
   # copy the data from local to dockers
-  docker cp ./workspace/configs/${DATA_FILE} ${CID}:/opt/${DATA_FILE}
+  docker cp ./workspace/configs/${INDEX_FEEDER_FILE} ${CID}:/opt/${INDEX_FEEDER_FILE}
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-    docker exec kubectl-support kubectl cp /opt/${DATA_FILE} jenkins/gatling-solr-${c}:/opt/gatling/user-files/data/${DATA_FILE}
+    docker exec kubectl-support kubectl cp /opt/${INDEX_FEEDER_FILE} jenkins/gatling-solr-${c}:/opt/gatling/user-files/data/${INDEX_FEEDER_FILE}
   done
 else
-  rm -rf ./DATA_FILE
+  rm -rf ./INDEX_FEEDER_FILE
+fi
+
+# we're requiring QUERY_FEEDER_FILE (instead of actual file name) so bash can read the ENV var
+if [ ! -z "${QUERY_FEEDER_FILE}" ]; then
+  if  [ ! -f ./QUERY_FEEDER_FILE ]; then
+    echo "Found ENV{QUERY_FEEDER_FILE}=${QUERY_FEEDER_FILE} -- but ./QUERY_FEEDER_FILE not found, jenkins bug?" && exit -1;
+  fi
+  echo "Copying user supplied patch to workspace/data/${QUERY_FEEDER_FILE}"
+  cp ./INDEX_FEEDER_FILE ./workspace/data/${QUERY_FEEDER_FILE}
+
+  # copy the data from local to dockers
+  docker cp ./workspace/configs/${QUERY_FEEDER_FILE} ${CID}:/opt/${QUERY_FEEDER_FILE}
+  for (( c=0; c<${GATLING_NODES}; c++ ))
+  do
+    docker exec kubectl-support kubectl cp /opt/${QUERY_FEEDER_FILE} jenkins/gatling-solr-${c}:/opt/gatling/user-files/data/${QUERY_FEEDER_FILE}
+  done
+else
+  rm -rf ./INDEX_FEEDER_FILE
 fi
 
 # we're requiring SIMULATION_FILE so bash can read the ENV var
