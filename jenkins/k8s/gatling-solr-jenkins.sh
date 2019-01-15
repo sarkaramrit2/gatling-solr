@@ -34,6 +34,7 @@ ESTIMATED_NODES_2=$((GATLING_NODES + 6))
 CID=`docker container ls -aq -f "name=kubectl-support"`
 
 # initialise the k8s cluster with zookeepers, solr clusters, gatling-solr image
+sed -i "s/namespace_filler/${GCP_K8_CLUSTER_NAMESPACE}/" ./jenkins/k8s/cluster.yaml
 sed -i "s/gatling-nodes-replicas/${GATLING_NODES}/" ./jenkins/k8s/cluster.yaml
 docker cp ./jenkins/k8s/cluster.yaml ${CID}:/opt/cluster.yaml
 # optional property files a user may have uploaded to jenkins
