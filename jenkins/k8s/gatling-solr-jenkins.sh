@@ -86,9 +86,9 @@ if [ "$IMPLICIT_CLUSTER" = true ] ; then
 else
         # (re)create collection 'wiki' with shards 2 replicas 2
     docker cp ./jenkins/collection-config ${CID}:/opt/collection-config
-    docker exec kubectl-support kubectl cp /opt/collection-config ${GCP_K8_CLUSTER_NAMESPACE}/solr-solr-bench-0:/opt/solr/collection-config
-    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-solr-bench-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
-    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-solr-bench-0 -- /opt/solr/bin/solr create -c wiki -s 2 -rf 2 -d /opt/solr/collection-config/
+    docker exec kubectl-support kubectl cp /opt/collection-config ${GCP_K8_CLUSTER_NAMESPACE}/${EXT_SOLR_NODE_POD_NAME}:/opt/solr/collection-config
+    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
+    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr create -c wiki -s 2 -rf 2 -d /opt/solr/collection-config/
 fi
 
 # optional property files a user may have uploaded to jenkins
