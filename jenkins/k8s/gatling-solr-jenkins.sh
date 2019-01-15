@@ -54,20 +54,20 @@ fi
 
 docker exec kubectl-support kubectl create -f /opt/cluster.yaml
 # wait until all pods comes up running
-TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
+TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=${GCP_K8_CLUSTER_NAMESPACE} | wc -l`
 # find better way to determine all pods running
 while [ "${TOTAL_PODS}" != "${ESTIMATED_NODES_1}" -a "${TOTAL_PODS}" != "${ESTIMATED_NODES_2}" ]
 do
    sleep 30
-   TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=jenkins | wc -l`
+   TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=${GCP_K8_CLUSTER_NAMESPACE} | wc -l`
 done
 
 if [ "$IMPLICIT_CLUSTER" = true ] ; then
     # (re)create collection 'wiki' with shards 2 replicas 2
     docker cp ./jenkins/collection-config ${CID}:/opt/collection-config
-    docker exec kubectl-support kubectl cp /opt/collection-config jenkins/solr-dummy-cluster-0:/opt/solr/collection-config
-    docker exec kubectl-support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
-    docker exec kubectl-support kubectl exec -n jenkins solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s 2 -rf 2 -d /opt/solr/collection-config/
+    docker exec kubectl-support kubectl cp /opt/collection-config ${GCP_K8_CLUSTER_NAMESPACE}/solr-dummy-cluster-0:/opt/solr/collection-config
+    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
+    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s 2 -rf 2 -d /opt/solr/collection-config/
 fi
 
 # optional property files a user may have uploaded to jenkins
@@ -84,7 +84,7 @@ if [ ! -z "${INDEX_PROP_FILE}" ]; then
   docker cp ./workspace/configs/index.config.properties ${CID}:/opt/index.config.properties
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-    docker exec kubectl-support kubectl cp /opt/index.config.properties jenkins/gatling-solr-${c}:/opt/gatling/user-files/configs/index.config.properties
+    docker exec kubectl-support kubectl cp /opt/index.config.properties ${GCP_K8_CLUSTER_NAMESPACE}/gatling-solr-${c}:/opt/gatling/user-files/configs/index.config.properties
   done
 else
   rm -rf ./INDEX_PROP_FILE
@@ -102,7 +102,7 @@ if [ ! -z "${QUERY_PROP_FILE}" ]; then
   docker cp ./workspace/configs/query.config.properties ${CID}:/opt/query.config.properties
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-    docker exec kubectl-support kubectl cp /opt/query.config.properties jenkins/gatling-solr-${c}:/opt/gatling/user-files/configs/query.config.properties
+    docker exec kubectl-support kubectl cp /opt/query.config.properties ${GCP_K8_CLUSTER_NAMESPACE}/gatling-solr-${c}:/opt/gatling/user-files/configs/query.config.properties
   done
 else
   rm -rf ./QUERY_PROP_FILE
@@ -120,7 +120,7 @@ if [ ! -z "${INDEX_FEEDER_FILE}" ]; then
   docker cp ./workspace/configs/${INDEX_FEEDER_FILE} ${CID}:/opt/${INDEX_FEEDER_FILE}
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-    docker exec kubectl-support kubectl cp /opt/${INDEX_FEEDER_FILE} jenkins/gatling-solr-${c}:/opt/gatling/user-files/data/${INDEX_FEEDER_FILE}
+    docker exec kubectl-support kubectl cp /opt/${INDEX_FEEDER_FILE} ${GCP_K8_CLUSTER_NAMESPACE}/gatling-solr-${c}:/opt/gatling/user-files/data/${INDEX_FEEDER_FILE}
   done
 else
   rm -rf ./INDEX_FEEDER_FILE
@@ -138,7 +138,7 @@ if [ ! -z "${QUERY_FEEDER_FILE}" ]; then
   docker cp ./workspace/configs/${QUERY_FEEDER_FILE} ${CID}:/opt/${QUERY_FEEDER_FILE}
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-    docker exec kubectl-support kubectl cp /opt/${QUERY_FEEDER_FILE} jenkins/gatling-solr-${c}:/opt/gatling/user-files/data/${QUERY_FEEDER_FILE}
+    docker exec kubectl-support kubectl cp /opt/${QUERY_FEEDER_FILE} ${GCP_K8_CLUSTER_NAMESPACE}/gatling-solr-${c}:/opt/gatling/user-files/data/${QUERY_FEEDER_FILE}
   done
 else
   rm -rf ./INDEX_FEEDER_FILE
@@ -156,7 +156,7 @@ if [ ! -z "${SIMULATION_FILE}" ]; then
   docker cp ./workspace/simulations/${SIMULATION_FILE} ${CID}:/opt/${SIMULATION_FILE}
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-    docker exec kubectl-support kubectl cp /opt/${SIMULATION_FILE} jenkins/gatling-solr-${c}:/opt/gatling/user-files/simulations/${SIMULATION_FILE}
+    docker exec kubectl-support kubectl cp /opt/${SIMULATION_FILE} ${GCP_K8_CLUSTER_NAMESPACE}/gatling-solr-${c}:/opt/gatling/user-files/simulations/${SIMULATION_FILE}
   done
 else
   rm -rf ./SIMULATION_FILE
@@ -167,17 +167,17 @@ if [ ! -z "${REMOTE_INDEX_FILE_PATH}" ]; then
   # download the remote indexing file
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-     docker exec -d kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- curl "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/enwiki.random.lines.csv
+     docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- curl "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/enwiki.random.lines.csv
   done
 
   # wait until index file copies to all gatling nodes
   for (( c=0; c<${GATLING_NODES}; c++ ))
     do
-    IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- ps | grep "curl" | wc -l`
+    IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- ps | grep "curl" | wc -l`
     while [ "${IF_CMD_EXEC}" != "0" ]
     do
       sleep 10
-      IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- ps | grep "curl" | wc -l`
+      IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- ps | grep "curl" | wc -l`
       done
   done
 fi
@@ -191,23 +191,23 @@ while read -r CLASS; do
     # create results directory on the docker
     for (( c=0; c<${GATLING_NODES}; c++ ))
     do
-      docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- mkdir -p /tmp/gatling-perf-tests-${c}-${CLASS}/results
+      docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- mkdir -p /tmp/gatling-perf-tests-${c}-${CLASS}/results
     done
 
     # run gatling test for a simulation and pass relevant params
     for (( c=0; c<${GATLING_NODES}; c++ ))
     do
-      #docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
-      docker exec -d kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
+      #docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
+      docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
     done
 
     for (( c=0; c<${GATLING_NODES}; c++ ))
     do
-        IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- ps | grep "gatling" | wc -l`
+        IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- ps | grep "gatling" | wc -l`
         while [ "${IF_CMD_EXEC}" != "0" ]
         do
             sleep 20
-            IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n jenkins gatling-solr-${c} -- ps | grep "gatling" | wc -l`
+            IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- ps | grep "gatling" | wc -l`
         done
     done
 
@@ -215,7 +215,7 @@ while read -r CLASS; do
     for (( c=0; c<${GATLING_NODES}; c++ ))
     do
         docker exec kubectl-support mkdir -p /opt/results/reports-${c}-${CLASS}
-        docker exec kubectl-support kubectl cp jenkins/gatling-solr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS}/results/ /opt/results/reports-${c}-${CLASS}/
+        docker exec kubectl-support kubectl cp ${GCP_K8_CLUSTER_NAMESPACE}/gatling-solr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS}/results/ /opt/results/reports-${c}-${CLASS}/
     done
 
     docker exec kubectl-support gatling.sh -ro /opt/results/
@@ -228,6 +228,6 @@ done <<< "${SIMULATION_CLASS}"
 
 if [ "$IMPLICIT_CLUSTER" = true ] ; then
     # copy the logs to the workspace
-    docker exec kubectl-support kubectl cp jenkins/solr-dummy-cluster-0:/opt/solr/logs /opt/solr-logs
+    docker exec kubectl-support kubectl cp ${GCP_K8_CLUSTER_NAMESPACE}/solr-dummy-cluster-0:/opt/solr/logs /opt/solr-logs
     docker cp ${CID}:/opt/solr-logs ./workspace/reports-${BUILD_NUMBER}/solr-logs
 fi
