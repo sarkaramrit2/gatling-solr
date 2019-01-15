@@ -51,6 +51,11 @@ else
   rm -rf ./CLUSTER_YAML_FILE
 fi
 
+if [ "$IMPLICIT_CLUSTER" = true ] ; then
+    docker exec kubectl delete statefulsets gatling-solr --namespace=amrit
+    docker exec kubectl delete service gatling-solr --namespace=amrit
+fi
+
 docker exec kubectl-support kubectl create -f /opt/cluster.yaml
 # wait until all pods comes up running
 TOTAL_PODS=`docker exec kubectl-support kubectl get pods --field-selector=status.phase=Running --namespace=${GCP_K8_CLUSTER_NAMESPACE} | wc -l`
