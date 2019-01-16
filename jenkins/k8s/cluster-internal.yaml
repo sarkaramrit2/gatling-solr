@@ -85,11 +85,11 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           limits:
-            cpu: 500m
-            memory: 1Gi
+            cpu: 750m
+            memory: 4Gi
           requests:
-            cpu: 250m
-            memory: 512Mi
+            cpu: 500m
+            memory: 2Gi
 
         ports:
         - containerPort: 8983
@@ -231,11 +231,11 @@ spec:
         image: "k8s.gcr.io/kubernetes-zookeeper:1.0-3.4.10"
         resources:
           limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
             cpu: 250m
             memory: 512Mi
-          requests:
-            cpu: 100m
-            memory: 256Mi
 
         ports:
         - containerPort: 2181
@@ -258,7 +258,7 @@ spec:
           --tick_time=2000 \
           --init_limit=10 \
           --sync_limit=5 \
-          --heap=512M \
+          --heap=1G \
           --max_client_cnxns=60 \
           --snap_retain_count=3 \
           --purge_interval=12 \
@@ -333,6 +333,13 @@ spec:
       containers:
       - name: gatling-solr
         image: sarkaramrit2/gatling-solr:latest
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2Gi
+          requests:
+            cpu: 250m
+            memory: 1Gi
         ports:
         - containerPort: 80
           name: gatling-solr
