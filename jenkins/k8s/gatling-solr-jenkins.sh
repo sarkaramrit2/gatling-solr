@@ -80,14 +80,15 @@ else
     done
 fi
 
+# TODO: remove executing commands within the solr cluster and utilise Collection Admin API
 if [ "$IMPLICIT_CLUSTER" = true ] ; then
-    # (re)create collection 'wiki' with shards 2 replicas 2
+    # (re)create collection 'wiki'
     docker cp ./jenkins/collection-config ${CID}:/opt/collection-config
     docker exec kubectl-support kubectl cp /opt/collection-config ${GCP_K8_CLUSTER_NAMESPACE}/solr-dummy-cluster-0:/opt/solr/collection-config
     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s $((NUM_SHARDS)) -rf $((NUM_REPLICAS)) -d /opt/solr/collection-config/
 else
-        # (re)create collection 'wiki' with shards 2 replicas 2
+    # (re)create collection 'wiki'
     docker cp ./jenkins/collection-config ${CID}:/opt/collection-config
     docker exec kubectl-support kubectl cp /opt/collection-config ${GCP_K8_CLUSTER_NAMESPACE}/${EXT_SOLR_NODE_POD_NAME}:/opt/solr/collection-config
     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
@@ -254,4 +255,11 @@ if [ "$IMPLICIT_CLUSTER" = true ] ; then
     # copy the logs to the workspace
     docker exec kubectl-support kubectl cp ${GCP_K8_CLUSTER_NAMESPACE}/solr-dummy-cluster-0:/opt/solr/logs /opt/solr-logs
     docker cp ${CID}:/opt/solr-logs ./workspace/reports-${BUILD_NUMBER}/solr-logs
+fi
+
+# TODO: remove executing commands within the solr cluster and utilise Collection Admin API
+if [ "$IMPLICIT_CLUSTER" = true ] ; then
+    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
+else
+    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
 fi
