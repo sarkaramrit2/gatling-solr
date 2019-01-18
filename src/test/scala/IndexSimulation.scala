@@ -1,13 +1,11 @@
-import java.io.{File}
+import java.io.{BufferedReader, File, FileReader}
 import java.util
-import java.util.{Properties}
+import java.util.Properties
 
 import com.lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import org.apache.solr.common.SolrInputDocument
-import java.io.BufferedReader
-import java.io.FileReader
 
 
 class IndexSimulation extends Simulation {
