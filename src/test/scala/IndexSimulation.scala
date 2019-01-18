@@ -1,12 +1,14 @@
-import java.io.{File, FileReader}
+import java.io.{File}
 import java.util
-import java.util.{Properties, Scanner}
+import java.util.{Properties}
 
 import com.lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
-import org.apache.solr.client.solrj.impl.CloudSolrClient
 import org.apache.solr.common.SolrInputDocument
+import java.io.BufferedReader
+import java.io.FileReader
+
 
 class IndexSimulation extends Simulation {
 
@@ -39,15 +41,17 @@ class IndexSimulation extends Simulation {
 
     private val indexFile = new File(Config.indexFilePath)
     private val fileReader = new FileReader(indexFile)
-    private val scanner = new Scanner(fileReader)
+    private val reader = new BufferedReader(fileReader)
 
-    override def hasNext = scanner.hasNext()
+    private var hasNextLine = ""
+
+    override def hasNext = hasNextLine != null
 
     override def next: Map[String, util.ArrayList[SolrInputDocument]] = {
       var batchSize = Config.indexBatchSize.toInt
       val records = new util.ArrayList[SolrInputDocument]()
-      while (batchSize > 0 && scanner.hasNext()) {
-        val record = scanner.nextLine()
+      var record = reader.readLine()
+      while (batchSize > 0 && record != null) {
         val doc = new SolrInputDocument()
         val fieldNames = Config.header.split(Config.headerSep) // default comma
         val fieldValues = record.split(Config.fieldValuesSep) // default comma
@@ -59,7 +63,10 @@ class IndexSimulation extends Simulation {
         }
         records.add(doc)
         batchSize = batchSize - 1
+        record = reader.readLine()
       }
+
+      hasNextLine = record
 
       Map(
         "record" -> records)
