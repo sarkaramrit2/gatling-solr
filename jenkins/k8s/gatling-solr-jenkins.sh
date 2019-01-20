@@ -192,7 +192,8 @@ if [ ! -z "${REMOTE_INDEX_FILE_PATH}" ]; then
   # download the remote indexing file
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-     docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- curl "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/enwiki.random.lines.csv
+     docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- mkdir -p /opt/gatling/user-files/data/external/
+     docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- curl "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/external/${REMOTE_INDEX_FILE_PATH}
   done
 
   # wait until index file copies to all gatling nodes

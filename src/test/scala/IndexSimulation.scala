@@ -15,23 +15,23 @@ class IndexSimulation extends Simulation {
     import java.io.FileInputStream
 
     val prop: Properties = new Properties
-    val propFile = new FileInputStream("/opt/gatling/user-files/" +
+    val propFile = new FileInputStream("/Users/apple/git_space/gatling-solr-new/gatling-solr/src/test/resources/" +
       "configs/index.config.properties")
     prop.load(propFile)
 
-    val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
+    val indexFilePath = prop.getProperty("indexFilePath", "/Users/apple/git_space/gatling-solr-new/gatling-solr/src/test/resources/" +
       "data/enwiki.random.lines.csv")
-    val numBatchesPerUser = prop.getProperty("numBatchesPerUser", "200")
-    val maxNumUsers = prop.getProperty("maxNumUsers", "2")
+    val numBatchesPerUser = prop.getProperty("numBatchesPerUser", "999999")
+    val maxNumUsers = prop.getProperty("maxNumUsers", "4")
     val minNumUsers = prop.getProperty("minNumUsers", "1")
     val totalTimeInMinutes = prop.getProperty("totalTimeInMinutes", "1")
-    val indexBatchSize = prop.getProperty("indexBatchSize", "5000")
+    val indexBatchSize = prop.getProperty("indexBatchSize", "1000")
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
     val defaultCollection = prop.getProperty("defaultCollection", "wiki")
     val header = prop.getProperty("header", "title,time,description")
     val headerSep = prop.getProperty("header.sep", ",")
     val fieldValuesSep = prop.getProperty("fieldValues.sep", ",")
-    val numClients = prop.getProperty("numClients", "1")
+    val numClients = prop.getProperty("numClients", "4")
 
   }
 
