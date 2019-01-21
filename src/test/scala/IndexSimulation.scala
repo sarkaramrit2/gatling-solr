@@ -15,11 +15,11 @@ class IndexSimulation extends Simulation {
     import java.io.FileInputStream
 
     val prop: Properties = new Properties
-    val propFile = new FileInputStream("/Users/apple/git_space/gatling-solr-new/gatling-solr/src/test/resources/" +
+    val propFile = new FileInputStream("/opt/gatling/user-files/" +
       "configs/index.config.properties")
     prop.load(propFile)
 
-    val indexFilePath = prop.getProperty("indexFilePath", "/Users/apple/git_space/gatling-solr-new/gatling-solr/src/test/resources/" +
+    val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
       "data/enwiki.random.lines.csv")
     val numBatchesPerUser = prop.getProperty("numBatchesPerUser", "999999")
     val maxNumUsers = prop.getProperty("maxNumUsers", "4")
