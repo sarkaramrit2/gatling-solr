@@ -20,18 +20,18 @@ class IndexSimulation extends Simulation {
     prop.load(propFile)
 
     val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
-      "data/enwiki.random.lines.csv")
+      "data/enwiki-20120502-lines-1k.txt")
     val numBatchesPerUser = prop.getProperty("numBatchesPerUser", "999999")
-    val maxNumUsers = prop.getProperty("maxNumUsers", "4")
+    val maxNumUsers = prop.getProperty("maxNumUsers", "9")
     val minNumUsers = prop.getProperty("minNumUsers", "1")
     val totalTimeInMinutes = prop.getProperty("totalTimeInMinutes", "1")
-    val indexBatchSize = prop.getProperty("indexBatchSize", "1000")
+    val indexBatchSize = prop.getProperty("indexBatchSize", "100")
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
     val defaultCollection = prop.getProperty("defaultCollection", "wiki")
     val header = prop.getProperty("header", "title,time,description")
     val headerSep = prop.getProperty("header.sep", ",")
     val fieldValuesSep = prop.getProperty("fieldValues.sep", ",")
-    val numClients = prop.getProperty("numClients", "4")
+    val numClients = prop.getProperty("numClients", "9")
 
   }
 
