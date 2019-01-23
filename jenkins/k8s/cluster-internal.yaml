@@ -121,7 +121,7 @@ spec:
       - "ReadWriteOnce"
       resources:
         requests:
-          storage: "20Gi"
+          storage: "40Gi"
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
@@ -281,7 +281,7 @@ spec:
       - "ReadWriteOnce"
       resources:
         requests:
-          storage: "20Gi"
+          storage: "40Gi"
 
 ---
 apiVersion: v1
