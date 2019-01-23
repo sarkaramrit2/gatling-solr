@@ -193,7 +193,7 @@ if [ ! -z "${REMOTE_INDEX_FILE_PATH}" ]; then
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
      docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- mkdir -p /opt/gatling/user-files/data/
-     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- curl "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/external.data.txt
+     docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- curl "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/external.data.txt
   done
 
   # wait until index file copies to all gatling nodes
@@ -223,8 +223,8 @@ while read -r CLASS; do
     # run gatling test for a simulation and pass relevant params
     for (( c=0; c<${GATLING_NODES}; c++ ))
     do
-      docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
-      #docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
+      #docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
+      docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
     done
 
     for (( c=0; c<${GATLING_NODES}; c++ ))
