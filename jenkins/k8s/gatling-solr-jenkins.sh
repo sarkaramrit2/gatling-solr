@@ -208,6 +208,16 @@ if [ ! -z "${REMOTE_INDEX_FILE_PATH}" ]; then
   done
 fi
 
+# set gatling nodes heap settings
+sed -i "s/replace-heap-settings/${GATLING_HEAP}/" ./jenkins/k8s/gatling.sh
+docker cp ./jenkins/k8s/gatling.sh ${CID}:/opt/gatling.sh
+# create results directory on the docker
+for (( c=0; c<${GATLING_NODES}; c++ ))
+do
+    docker exec kubectl-support kubectl cp /opt/gatling.sh ${GCP_K8_CLUSTER_NAMESPACE}/gatling-solr-${c}:/opt/gatling/bin/gatling.sh
+done
+
+
 # execute the load test on docker
 echo "JOB DESCRIPTION: running....."
 
