@@ -65,16 +65,6 @@ spec:
     spec:
       securityContext:
         fsGroup: 8983
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: "app"
-                operator: In
-                values:
-                - solr-dummy-cluster
-            topologyKey: "kubernetes.io/hostname"
       volumes:
       - name: solrlogs
         emptyDir: {}
@@ -85,12 +75,11 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           limits:
-            cpu: 750m
-            memory: 2Gi
+            cpu: 3
+            memory: 8Gi
           requests:
-            cpu: 500m
-            memory: 1Gi
-
+            cpu: 2
+            memory: 6Gi
         ports:
         - containerPort: 8983
           name: client
@@ -100,11 +89,13 @@ spec:
         - name: SOLR_PORT
           value: "8983"
         - name: ZK_HOST
-          value: "zk-dummy-cluster-0.zk-hs-dummy-cluster:2181,zk-dummy-cluster-1.zk-hs-dummy-cluster:2181,zk-dummy-cluster-2.zk-hs-dummy-cluster:2181"
+          value: "zk-dummy-cluster-0.zk-hs-dummy-cluster:2181"
         - name: SOLR_LOGS_DIR
           value: "/opt/solr/logs"
         - name: SOLR_DATA_HOME
           value: "/opt/solr/data"
+        - name: SOLR_HEAP
+          value: "4G"
         livenessProbe:
           initialDelaySeconds: 20
           periodSeconds: 10
@@ -122,10 +113,6 @@ spec:
           mountPath: /opt/solr/data
         - name: solrlogs
           mountPath: /opt/solr/logs
-      initContainers:
-      - name: check-zk
-        image: busybox:latest
-        command: ['sh', '-c', 'COUNTER=0; while [  $COUNTER -lt 30 ]; do for i in "zk-dummy-cluster-1.zk-hs-dummy-cluster" "zk-dummy-cluster-2.zk-hs-dummy-cluster"; do mode=$(echo srvr | nc $i 2181 | grep "Mode"); if [ "$mode" == "Mode: leader" ]; then exit 0; fi; done; let COUNTER=COUNTER+1; sleep 2; done; echo "Did NOT see a ZK leader after 60 secs!"; exit 1;']
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -134,7 +121,7 @@ spec:
       - "ReadWriteOnce"
       resources:
         requests:
-          storage: "10Gi"
+          storage: "20Gi"
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
@@ -145,8 +132,7 @@ spec:
   selector:
     matchLabels:
       app: solr-dummy-cluster
-  maxUnavailable: 1
-
+  maxUnavailable: 2
 ---
 # Source: solr-base/templates/zookeeper.yaml
 ---
@@ -204,7 +190,7 @@ spec:
     matchLabels:
       app: zk-dummy-cluster
   serviceName: zk-hs-dummy-cluster
-  replicas: 3
+  replicas: 1
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: Parallel
@@ -231,10 +217,10 @@ spec:
         image: "k8s.gcr.io/kubernetes-zookeeper:1.0-3.4.10"
         resources:
           limits:
-            cpu: 500m
+            cpu: 1
             memory: 1Gi
           requests:
-            cpu: 250m
+            cpu: 500m
             memory: 512Mi
 
         ports:
@@ -248,7 +234,7 @@ spec:
         - sh
         - -c
         - "start-zookeeper \
-          --servers=3 \
+          --servers=1 \
           --data_dir=/var/lib/zookeeper/data \
           --data_log_dir=/var/lib/zookeeper/data/log \
           --conf_dir=/opt/zookeeper/conf \
@@ -295,7 +281,7 @@ spec:
       - "ReadWriteOnce"
       resources:
         requests:
-          storage: "10Gi"
+          storage: "20Gi"
 
 ---
 apiVersion: v1
@@ -323,7 +309,7 @@ spec:
     matchLabels:
       app: gatling-solr # has to match .spec.template.metadata.labels
   serviceName: "gatling-solr"
-  replicas: gatling-nodes-replicas # by default is 1
+  replicas: gatling-nodes-replicas
   template:
     metadata:
       labels:
@@ -333,13 +319,18 @@ spec:
       containers:
       - name: gatling-solr
         image: sarkaramrit2/gatling-solr:latest
-        resources:
-          limits:
-            cpu: 500m
-            memory: 2Gi
-          requests:
-            cpu: 250m
-            memory: 1Gi
         ports:
         - containerPort: 80
           name: gatling-solr
+        volumeMounts:
+        - name: gatlingdata
+          mountPath: /opt/gatling/user-files/data/external
+  volumeClaimTemplates:
+  - metadata:
+      name: gatlingdata
+    spec:
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "90Gi"
