@@ -6,11 +6,11 @@ Solr is the popular, blazing-fast, open source enterprise search platform built 
 Gatling-Solr project available at https://github.com/sarkaramrit2/gatling-solr. The intention of the project is make a robust framework to load test SolrCloud clusters; both dynamic indexing and querying.
 
 The project is created in five modules:
-Dynamic Query Creator
-Gatling Solr DSL
-Gatling Solr Docker
-Gatling Solr Kubernetes
-Gatling Solr Jenkins
+### Dynamic Query Creator
+### Gatling Solr DSL
+### Gatling Solr Docker
+### Gatling Solr Kubernetes
+### Gatling Solr Jenkins
 
 Note in this project we have utilised Wikipedia dump available here. Note: we have cleaned the data to get rid of special characters, HTML tags etc. to have proper text and numbers.
 
@@ -119,37 +119,37 @@ Property file path must be defined in the Simulation scala file.
 
 The parameters needs to specified in index.config.properties:
 
-indexFilePath -- absolute path to file to be indexed, allowed CSV, TSV
-numBatchesPerUser -- total batches of docs per user / concurrent thread, default
-maxNumUsers -- max number of users to be ramped up for testing, default
-minNumUsers -- min number of users for testing before ramping, default
-totalTimeInMinutes -- total time the users will make requests, default
-indexBatchSize -- total docs per batch for each users, default
-zkHost -- zookeeper string of the solr cluster, default
-defaultCollection -- collection docs to be indexed to, default
-header -- field names to be indexed in order, default
-header.sep -- separator for header to be split to generate field names, default
-fieldValues.sep -- separator each line in index file to be split on
-numClients -- total number of CloudSolrClients need to be used for testing
+indexFilePath -- absolute path to file to be indexed, allowed CSV, TSV.
+numBatchesPerUser -- total batches of docs per user / concurrent thread, default.
+maxNumUsers -- max number of users to be ramped up for testing, default.
+minNumUsers -- min number of users for testing before ramping, default.
+totalTimeInMinutes -- total time the users will make requests, default.
+indexBatchSize -- total docs per batch for each users, default.
+zkHost -- zookeeper string of the solr cluster, default.
+defaultCollection -- collection docs to be indexed to, default.
+header -- field names to be indexed in order, default.
+header.sep -- separator for header to be split to generate field names, default.
+fieldValues.sep -- separator each line in index file to be split on.
+numClients -- total number of CloudSolrClients need to be used for testing.
 
 The parameters needs to specified in query.config.properties:
 
-queryFeederSource -- absolute path to file to be used for feeding queries
-numQueriesPerUser -- total number of queries per user
-maxNumUsers -- max number of users to be ramped up for testing, default
-minNumUsers -- min number of users for testing before ramping, default
-totalTimeInMinutes -- total time the users will make requests, default
-basequery -- query string with defaults specified
-zkHost -- zookeeper string of the solr cluster, default
-defaultCollection -- collection docs to be indexed to, default
-numClients -- total number of CloudSolrClients need to be used for testing
+queryFeederSource -- absolute path to file to be used for feeding queries.
+numQueriesPerUser -- total number of queries per user.
+maxNumUsers -- max number of users to be ramped up for testing, default.
+minNumUsers -- min number of users for testing before ramping, default.
+totalTimeInMinutes -- total time the users will make requests, default.
+basequery -- query string with defaults specified.
+zkHost -- zookeeper string of the solr cluster, default.
+defaultCollection -- collection docs to be indexed to, default.
+numClients -- total number of CloudSolrClients need to be used for testing.
 
 Sample property files available here.
 
 Sample Simulation scala files available here.
 
-QuerySimulation 
-IndexV2Simulation 
+#### QuerySimulation 
+#### IndexV2Simulation 
 
 # Gatling Solr Docker
 
@@ -167,11 +167,11 @@ Mount configuration and simulation files from the host machine and run gatling:
 docker run -it -d --rm -v configs:/opt/gatling/user-files/configs/ simulations:/opt/gatling/user-files/simulations/ \ --name gatling-solr sarkaramrit2/gatling-solr
  
 Resources - 
-GATLING_HOME set at /opt/gatling
-Property configs to be put under /opt/gatling/user-files/configs/
-Respective data files to be put under /opt/gatling/user-files/data/
-Default configs for Gatling under /opt/gatling/conf/
-Simulation scala files available under /opt/gatling/user-files/simulations/
+GATLING_HOME set at /opt/gatling.
+Property configs to be put under /opt/gatling/user-files/configs/.
+Respective data files to be put under /opt/gatling/user-files/data/.
+Default configs for Gatling under /opt/gatling/conf/.
+Simulation scala files available under /opt/gatling/user-files/simulations/.
  
 How to run test and generate reports with Docker
 
