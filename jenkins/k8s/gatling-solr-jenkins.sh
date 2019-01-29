@@ -56,7 +56,7 @@ fi
 # docker exec kubectl-support kubectl delete service gatling-solr --namespace=${GCP_K8_CLUSTER_NAMESPACE} || echo "gatling service not available!!"
 sleep 10
 
-docker exec kubectl-support kubectl create -f /opt/cluster.yaml
+docker exec kubectl-support kubectl create -f /opt/cluster.yaml || echo "gatling service already created!!"
 # buffer sleep for 30 sec to get the pods ready, and then check
 sleep 30
 
