@@ -193,6 +193,7 @@ if [ ! -z "${REMOTE_INDEX_FILE_PATH}" ]; then
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
      docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- mkdir -p /opt/gatling/user-files/data/
+     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- rm -rf /opt/gatling/user-files/data/external.data.txt
      docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- curl "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/external.data.txt
      #docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- curl "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/external.data.txt
   done
@@ -270,8 +271,8 @@ if [ "$IMPLICIT_CLUSTER" = true ] ; then
 fi
 
 # TODO: remove executing commands within the solr cluster and utilise Collection Admin API
-if [ "$IMPLICIT_CLUSTER" = true ] ; then
-    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
-else
-    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
-fi
+#if [ "$IMPLICIT_CLUSTER" = true ] ; then
+ #   docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
+#else
+ #   docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
+#fi
