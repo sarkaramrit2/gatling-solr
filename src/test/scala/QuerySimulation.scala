@@ -53,8 +53,8 @@ class QuerySimulation extends Simulation {
 
   setUp(
     users.inject(
-      constantUsersPerSec(Config.maxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes),
-      rampUsersPerSec(Config.minNumUsers.toDouble) to Config.maxNumUsers.toDouble during
-        (Config.totalTimeInMinutes.toDouble minutes))
+      constantUsersPerSec(Config.maxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))//,
+      //rampUsersPerSec(Config.minNumUsers.toDouble) to Config.maxNumUsers.toDouble during
+        //(Config.totalTimeInMinutes.toDouble minutes))
   ).protocols(solrConf)
 }
