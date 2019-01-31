@@ -85,14 +85,18 @@ if [ "$IMPLICIT_CLUSTER" = true ] ; then
     # (re)create collection 'wiki'
     docker cp ./jenkins/collection-config ${CID}:/opt/collection-config
     docker exec kubectl-support kubectl cp /opt/collection-config ${GCP_K8_CLUSTER_NAMESPACE}/solr-dummy-cluster-0:/opt/solr/collection-config
-    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
-    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s $((NUM_SHARDS)) -rf $((NUM_REPLICAS)) -d /opt/solr/collection-config/ || echo "collection already created"
+    if [ "$RECREATE_COL" = true ] ; then
+        docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
+        docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s $((NUM_SHARDS)) -rf $((NUM_REPLICAS)) -d /opt/solr/collection-config/ || echo "collection already created"
+    fi
 else
     # (re)create collection 'wiki'
     docker cp ./jenkins/collection-config ${CID}:/opt/collection-config
     docker exec kubectl-support kubectl cp /opt/collection-config ${GCP_K8_CLUSTER_NAMESPACE}/${EXT_SOLR_NODE_POD_NAME}:/opt/solr/collection-config
-    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
-    docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr create -c wiki -s $((NUM_SHARDS)) -rf $((NUM_REPLICAS)) -d /opt/solr/collection-config/ || echo "collection already created"
+    if [ "$RECREATE_COL" = true ] ; then
+        docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
+        docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr create -c wiki -s $((NUM_SHARDS)) -rf $((NUM_REPLICAS)) -d /opt/solr/collection-config/ || echo "collection already created"
+    fi
 fi
 
 # optional property files a user may have uploaded to jenkins
@@ -235,8 +239,11 @@ while read -r CLASS; do
     # run gatling test for a simulation and pass relevant params
     for (( c=0; c<${GATLING_NODES}; c++ ))
     do
-      docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
-      # docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
+      if [ "$PRINT_GATLING_LOG" = true ] ; then
+        docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
+      else
+        docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatling-solr-${c} -- gatling.sh -s ${CLASS} -rd "--simulation--" -rf /tmp/gatling-perf-tests-${c}-${CLASS}/results -nr || echo "Current Simulation Ended!!"
+      fi
     done
 
     for (( c=0; c<${GATLING_NODES}; c++ ))
