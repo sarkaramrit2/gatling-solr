@@ -57,7 +57,7 @@ docker exec kubectl-support kubectl delete service gatling-solr --namespace=${GC
 sleep 10
 
 docker exec kubectl-support kubectl create -f /opt/cluster.yaml || echo "gatling service already created!!"
-# buffer sleep for 2 mins to get the pods ready, and then check
+# buffer sleep for 3 mins to get the pods ready, and then check
 sleep 120
 
 if [ "$IMPLICIT_CLUSTER" = true ] ; then
@@ -98,6 +98,9 @@ else
         docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr create -c wiki -s $((NUM_SHARDS)) -rf $((NUM_REPLICAS)) -d /opt/solr/collection-config/ || echo "collection already created"
     fi
 fi
+
+# buffer time for prometheus to intake solr metrics
+sleep 120
 
 # optional property files a user may have uploaded to jenkins
 # Note: Jenkins uses the same string for the file name, and the ENV var,
