@@ -10,6 +10,7 @@ object SolrProtocol {
 
   def apply(configuration: GatlingConfiguration): SolrProtocol = SolrProtocol(
     zkhost = "",
+    solrurl = "",
     collection = "",
     properties = new Properties(),
     numClients = 0
@@ -39,11 +40,14 @@ object SolrProtocol {
 
 case class SolrProtocol(
                          zkhost: String,
+                         solrurl: String,
                          collection: String,
                          properties: Properties,
                          numClients: Int) extends Protocol {
 
   def zkhost(zkhost: String): SolrProtocol = copy(zkhost = zkhost)
+
+  def solrurl(solrurl: String): SolrProtocol = copy(solrurl = solrurl)
 
   def collection(collection: String): SolrProtocol = copy(collection = collection)
 

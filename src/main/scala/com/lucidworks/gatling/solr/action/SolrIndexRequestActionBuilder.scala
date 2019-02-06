@@ -20,7 +20,13 @@ class SolrIndexRequestActionBuilder[K, V](solrAttributes: SolrIndexAttributes[K,
     val solrClients = new util.ArrayList[CloudSolrClient]()
 
     for( i <- 0 until solrComponents.solrProtocol.numClients){
-      val solrClient = new CloudSolrClient.Builder().withZkHost(solrComponents.solrProtocol.zkhost).build()
+      var solrClient= null: CloudSolrClient;
+      if (solrComponents.solrProtocol.zkhost != null & !solrComponents.solrProtocol.zkhost.isEmpty) {
+        solrClient = new CloudSolrClient.Builder().withZkHost(solrComponents.solrProtocol.zkhost).build()
+      }
+      else if (solrComponents.solrProtocol.solrurl != null & !solrComponents.solrProtocol.solrurl.isEmpty) {
+        solrClient = new CloudSolrClient.Builder().withSolrUrl(solrComponents.solrProtocol.solrurl).build()
+      }
       solrClient.setDefaultCollection(solrComponents.solrProtocol.collection)
       solrClients.add(solrClient)
     }
