@@ -26,6 +26,9 @@ rm -rf ./GCP_KEY_FILE
 docker exec kubectl-support gcloud auth activate-service-account --key-file /opt/${GCP_KEY_FILE}
 docker exec kubectl-support gcloud config get-value core/account
 docker exec kubectl-support gcloud config set project ${GCP_K8_PROJECT}
-docker exec kubectl-support gcloud config set compute/zone us-central1-a
 docker exec kubectl-support gcloud config list
-docker exec kubectl-support gcloud container clusters get-credentials ${GCP_K8_CLUSTER_NAME}
+if [ "$SET_ZONE_UNSET_REGION" = true ] ; then
+    docker exec kubectl-support gcloud container clusters get-credentials ${GCP_K8_CLUSTER_NAME} --zone "$ZONE_REGION"
+else
+    docker exec kubectl-support gcloud container clusters get-credentials ${GCP_K8_CLUSTER_NAME} --region "$ZONE_REGION"
+fi
