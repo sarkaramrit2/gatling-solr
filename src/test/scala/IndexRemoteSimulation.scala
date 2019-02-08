@@ -29,6 +29,7 @@ class IndexRemoteSimulation extends Simulation {
     val indexBatchSize = prop.getProperty("indexBatchSize", "1000")
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
     val solrUrl = prop.getProperty("solrUrl", "http://localhost:8983/solr")
+    val apiKey = prop.getProperty("apiKey", "--empty-here--")
     val defaultCollection = prop.getProperty("defaultCollection", "wiki")
     val header = prop.getProperty("header", "title,time,description")
     val headerSep = prop.getProperty("header.sep", ",")

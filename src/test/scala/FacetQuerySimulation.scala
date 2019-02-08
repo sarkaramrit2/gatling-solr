@@ -25,6 +25,7 @@ class FacetQuerySimulation extends Simulation {
     val basequery = prop.getProperty("basequery", "${params}&defType=edismax&qf=title description")
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
     val solrUrl = prop.getProperty("solrUrl", "http://localhost:8983/solr")
+    val apiKey = prop.getProperty("apiKey", "--empty-here--")
     val defaultCollection = prop.getProperty("defaultCollection", "wiki")
     val numClients = prop.getProperty("numClients", "1")
   }

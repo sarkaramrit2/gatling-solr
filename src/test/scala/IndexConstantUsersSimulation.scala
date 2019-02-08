@@ -17,8 +17,8 @@ class IndexConstantUsersSimulation extends Simulation {
     import java.io.FileInputStream
 
     val prop: Properties = new Properties
-    val propFile = new FileInputStream("/opt/gatling/user-files/" +
-      "configs/index.config.properties")
+    val propFile = new FileInputStream("/Users/apple/git_space/gatling-solr-new/gatling-solr/" +
+      "src/test/resources/configs/index.config.properties");
     prop.load(propFile)
 
     val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
