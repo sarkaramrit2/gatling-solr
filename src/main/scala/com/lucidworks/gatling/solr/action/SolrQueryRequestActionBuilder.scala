@@ -24,12 +24,7 @@ class SolrQueryRequestActionBuilder[K](solrAttributes: SolrQueryAttributes[K]) e
     val solrClients = new util.ArrayList[CloudSolrClient]()
 
     var solrClient= null: CloudSolrClient;
-    if (solrComponents.solrProtocol.zkhost != null & !solrComponents.solrProtocol.zkhost.isEmpty) {
-      solrClient = new CloudSolrClient.Builder().withZkHost(solrComponents.solrProtocol.zkhost).build()
-    }
-    else if (solrComponents.solrProtocol.solrurl != null & !solrComponents.solrProtocol.solrurl.isEmpty) {
-      solrClient = new CloudSolrClient.Builder().withSolrUrl(solrComponents.solrProtocol.solrurl).build()
-    }
+    solrClient = new CloudSolrClient.Builder().withZkHost(solrComponents.solrProtocol.zkhost).build()
     solrClient.setDefaultCollection(solrComponents.solrProtocol.collection)
     solrClients.add(solrClient)
 
