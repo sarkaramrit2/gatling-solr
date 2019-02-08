@@ -4,6 +4,7 @@ import java.util
 
 import com.lucidworks.gatling.solr.protocol.{SolrComponents, SolrProtocol}
 import com.lucidworks.gatling.solr.request.builder.SolrIndexAttributes
+import com.lucidworks.gatling.solr.utils.Constants
 import io.gatling.core.action.Action
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.structure.ScenarioContext
@@ -21,8 +22,7 @@ class SolrIndexRequestActionBuilder[K, V](solrAttributes: SolrIndexAttributes[K,
     val solrComponents: SolrComponents = protocolComponentsRegistry.components(SolrProtocol.SolrProtocolKey)
 
     val httpBuilder = HttpClients.custom()
-    httpBuilder.setDefaultHeaders(util.Arrays.asList(new BasicHeader("X-Default-Header", "default header")))
-    httpBuilder.setDefaultRequestConfig(RequestConfig.custom.setExpectContinueEnabled(true).build())
+    httpBuilder.setDefaultHeaders(util.Arrays.asList(new BasicHeader(Constants.API_KEY_HEADER, solrComponents.solrProtocol.apikey)))
     val httpClient = httpBuilder.build()
 
     val solrClients = new util.ArrayList[CloudSolrClient]()

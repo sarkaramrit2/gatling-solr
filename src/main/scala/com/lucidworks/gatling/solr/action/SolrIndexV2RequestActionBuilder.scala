@@ -7,12 +7,14 @@ import com.lucidworks.gatling.solr.request.builder.SolrIndexV2Attributes
 import io.gatling.core.action.Action
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.structure.ScenarioContext
-import org.apache.solr.client.solrj.impl.{CloudSolrClient}
+import org.apache.solr.client.solrj.impl.CloudSolrClient
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.message.BasicHeader
 import java.util
+
+import com.lucidworks.gatling.solr.utils.Constants
 
 
 class SolrIndexV2RequestActionBuilder[K, V](solrAttributes: SolrIndexV2Attributes[K, V]) extends ActionBuilder {
@@ -27,7 +29,7 @@ class SolrIndexV2RequestActionBuilder[K, V](solrAttributes: SolrIndexV2Attribute
     for( i <- 0 until solrComponents.solrProtocol.numClients){
 
       val httpBuilder = HttpClients.custom()
-      httpBuilder.setDefaultHeaders(util.Arrays.asList(new BasicHeader("X-Default-Header", "default header")))
+      httpBuilder.setDefaultHeaders(util.Arrays.asList(new BasicHeader(Constants.API_KEY_HEADER, solrComponents.solrProtocol.apikey)))
       httpBuilder.setDefaultRequestConfig(RequestConfig.custom.setExpectContinueEnabled(true).build())
       val httpClient = httpBuilder.build()
 
