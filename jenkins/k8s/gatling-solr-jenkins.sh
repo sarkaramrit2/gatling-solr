@@ -58,7 +58,7 @@ sleep 10
 
 docker exec kubectl-support kubectl create -f /opt/cluster.yaml || echo "gatling service already created!!"
 # buffer sleep for 3 mins to get the pods ready, and then check
-sleep 120
+sleep 60
 
 if [ "$IMPLICIT_CLUSTER" = true ] ; then
     # wait until all pods comes up running
