@@ -24,6 +24,7 @@ class QuerySimulation extends Simulation {
     val totalTimeInMinutes = prop.getProperty("totalTimeInMinutes", "1")
     val basequery = prop.getProperty("basequery", "${params}&defType=edismax&qf=title description")
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
+    val solrUrl = prop.getProperty("solrUrl", "http://localhost:8983/solr")
     val defaultCollection = prop.getProperty("defaultCollection", "wiki")
     val numClients = prop.getProperty("numClients", "1")
   }
