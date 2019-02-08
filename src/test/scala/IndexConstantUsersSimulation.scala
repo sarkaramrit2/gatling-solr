@@ -18,7 +18,7 @@ class IndexConstantUsersSimulation extends Simulation {
 
     val prop: Properties = new Properties
     val propFile = new FileInputStream("/opt/gatling/user-files/" +
-      "src/test/resources/configs/index.config.properties");
+      "configs/index.config.properties");
     prop.load(propFile)
 
     val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
