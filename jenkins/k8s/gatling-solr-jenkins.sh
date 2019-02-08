@@ -58,7 +58,7 @@ sleep 10
 
 docker exec kubectl-support kubectl create -f /opt/cluster.yaml || echo "gatling service already created!!"
 # buffer sleep for 3 mins to get the pods ready, and then check
-sleep 60
+sleep 15
 
 if [ "$IMPLICIT_CLUSTER" = true ] ; then
     # wait until all pods comes up running
@@ -66,7 +66,7 @@ if [ "$IMPLICIT_CLUSTER" = true ] ; then
     # find better way to determine all pods running
     while [ "${TOTAL_PODS}" != "${ESTIMATED_NODES_1}" -a "${TOTAL_PODS}" != "${ESTIMATED_NODES_2}" ]
     do
-       sleep 30
+       sleep 15
        TOTAL_PODS=`docker exec kubectl-support kubectl get pods --all-namespaces | grep "gatling" | grep "${GCP_K8_CLUSTER_NAMESPACE}" | wc -l`
     done
 else
@@ -75,7 +75,7 @@ else
     # find better way to determine all pods running
     while [ "${TOTAL_PODS}" != "${ESTIMATED_NODES_1}" -a "${TOTAL_PODS}" != "${ESTIMATED_NODES_2}" ]
     do
-       sleep 30
+       sleep 15
        TOTAL_PODS=`docker exec kubectl-support kubectl get pods --all-namespaces | grep "gatling" | grep "${GCP_K8_CLUSTER_NAMESPACE}" | wc -l`
     done
 fi
@@ -100,7 +100,7 @@ else
 fi
 
 # buffer time for prometheus to intake solr metrics
-sleep 60
+sleep 15
 
 # optional property files a user may have uploaded to jenkins
 # Note: Jenkins uses the same string for the file name, and the ENV var,
