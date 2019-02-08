@@ -5,6 +5,7 @@ import java.util.Properties
 
 import com.lucidworks.gatling.solr.protocol.SolrProtocol
 import com.lucidworks.gatling.solr.request.builder.SolrIndexAttributes
+import com.lucidworks.gatling.solr.utils.Constants
 import io.gatling.commons.stats.{KO, OK}
 import io.gatling.commons.util.DefaultClock
 import io.gatling.commons.validation.Validation
@@ -64,14 +65,14 @@ class SolrIndexRequestAction[K, V](val solrClients: util.ArrayList[CloudSolrClie
     solrAttributes payload session map { payload =>
 
       val updateRequest = new UpdateRequest()
-      val fieldNames = solrAttributes.header.split(prop.getProperty("header.sep", ",")) // default comma
+      val fieldNames = solrAttributes.header.split(prop.getProperty(Constants.HEADER_SEP, ",")) // default comma
 
-      val lines = payload.split(prop.getProperty("lines.sep", "\n")) // default new line char
+      val lines = payload.split(prop.getProperty(Constants.LINES_SEP, "\n")) // default new line char
       val docs = new util.ArrayList[SolrInputDocument]()
 
       for (j <- 0 until lines.length) {
         val doc = new SolrInputDocument()
-        val fieldValues = lines(j).split(prop.getProperty("fieldValues.sep", ",")) // default comma
+        val fieldValues = lines(j).split(prop.getProperty(Constants.FIELDVALUES_SEP, ",")) // default comma
 
         for (i <- 0 until fieldNames.length) {
           if (fieldValues.length - 1 >= i) {
