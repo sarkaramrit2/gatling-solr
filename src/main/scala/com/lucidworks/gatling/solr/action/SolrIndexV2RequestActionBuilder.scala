@@ -8,13 +8,7 @@ import io.gatling.core.action.Action
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.structure.ScenarioContext
 import org.apache.solr.client.solrj.impl.CloudSolrClient
-import org.apache.http.client.config.RequestConfig
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.impl.client.HttpClients
-import org.apache.http.message.BasicHeader
 import java.util
-
-import com.lucidworks.gatling.solr.utils.Constants
 
 
 class SolrIndexV2RequestActionBuilder[K, V](solrAttributes: SolrIndexV2Attributes[K, V]) extends ActionBuilder {

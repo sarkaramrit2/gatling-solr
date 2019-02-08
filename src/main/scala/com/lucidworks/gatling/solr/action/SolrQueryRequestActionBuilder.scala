@@ -4,13 +4,9 @@ import java.util
 
 import com.lucidworks.gatling.solr.protocol.{SolrComponents, SolrProtocol}
 import com.lucidworks.gatling.solr.request.builder.SolrQueryAttributes
-import com.lucidworks.gatling.solr.utils.Constants
 import io.gatling.core.action.Action
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.structure.ScenarioContext
-import org.apache.http.client.config.RequestConfig
-import org.apache.http.impl.client.HttpClients
-import org.apache.http.message.BasicHeader
 import org.apache.solr.client.solrj.impl.CloudSolrClient
 
 
