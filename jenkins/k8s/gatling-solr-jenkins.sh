@@ -100,7 +100,7 @@ else
 fi
 
 # buffer time for prometheus to intake solr metrics
-sleep 120
+sleep 60
 
 # optional property files a user may have uploaded to jenkins
 # Note: Jenkins uses the same string for the file name, and the ENV var,
