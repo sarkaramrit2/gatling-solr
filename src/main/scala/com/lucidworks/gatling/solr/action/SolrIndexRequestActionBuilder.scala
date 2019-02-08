@@ -20,10 +20,6 @@ class SolrIndexRequestActionBuilder[K, V](solrAttributes: SolrIndexAttributes[K,
 
     val solrComponents: SolrComponents = protocolComponentsRegistry.components(SolrProtocol.SolrProtocolKey)
 
-    val httpBuilder = HttpClients.custom()
-    httpBuilder.setDefaultHeaders(util.Arrays.asList(new BasicHeader(Constants.API_KEY_HEADER, solrComponents.solrProtocol.apikey)))
-    val httpClient = httpBuilder.build()
-
     val solrClients = new util.ArrayList[CloudSolrClient]()
 
     for( i <- 0 until solrComponents.solrProtocol.numClients){

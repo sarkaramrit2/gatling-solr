@@ -21,11 +21,6 @@ class SolrQueryRequestActionBuilder[K](solrAttributes: SolrQueryAttributes[K]) e
 
     val solrComponents: SolrComponents = protocolComponentsRegistry.components(SolrProtocol.SolrProtocolKey)
 
-    val httpBuilder = HttpClients.custom()
-    httpBuilder.setDefaultHeaders(util.Arrays.asList(new BasicHeader(Constants.API_KEY_HEADER, solrComponents.solrProtocol.apikey)))
-    httpBuilder.setDefaultRequestConfig(RequestConfig.custom.setExpectContinueEnabled(true).build())
-    val httpClient = httpBuilder.build()
-
     val solrClients = new util.ArrayList[CloudSolrClient]()
 
     var solrClient= null: CloudSolrClient;

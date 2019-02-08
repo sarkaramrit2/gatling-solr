@@ -28,17 +28,12 @@ class SolrIndexV2RequestActionBuilder[K, V](solrAttributes: SolrIndexV2Attribute
 
     for( i <- 0 until solrComponents.solrProtocol.numClients){
 
-      val httpBuilder = HttpClients.custom()
-      httpBuilder.setDefaultHeaders(util.Arrays.asList(new BasicHeader(Constants.API_KEY_HEADER, solrComponents.solrProtocol.apikey)))
-      httpBuilder.setDefaultRequestConfig(RequestConfig.custom.setExpectContinueEnabled(true).build())
-      val httpClient = httpBuilder.build()
-
       var solrClient= null: CloudSolrClient;
       if (solrComponents.solrProtocol.zkhost != null & !solrComponents.solrProtocol.zkhost.isEmpty) {
-        solrClient = new CloudSolrClient.Builder().withZkHost(solrComponents.solrProtocol.zkhost).withHttpClient(httpClient).build()
+        solrClient = new CloudSolrClient.Builder().withZkHost(solrComponents.solrProtocol.zkhost).build()
       }
       else if (solrComponents.solrProtocol.solrurl != null & !solrComponents.solrProtocol.solrurl.isEmpty) {
-        solrClient = new CloudSolrClient.Builder().withSolrUrl(solrComponents.solrProtocol.solrurl).withHttpClient(httpClient).build()
+        solrClient = new CloudSolrClient.Builder().withSolrUrl(solrComponents.solrProtocol.solrurl).build()
       }
       solrClient.setDefaultCollection(solrComponents.solrProtocol.collection)
       solrClients.add(solrClient)
