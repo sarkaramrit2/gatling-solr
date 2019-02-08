@@ -14,8 +14,8 @@ ENV GATLING_VERSION=3.0.0 \
 
 # Install Scala
 RUN \
-  apt-get update && apt-get install -y --no-install-recommends apt-util && \
-  apt-get update; apt-get install curl && \
+  apt-get update -y && apt-get install -y --no-install-recommends apt-util && \
+  apt-get update -y; apt-get install curl -y && \
   curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /root/ && \
   echo >> /root/.bashrc && \
   echo "export PATH=~/scala-$SCALA_VERSION/bin:$PATH" >> /root/.bashrc
