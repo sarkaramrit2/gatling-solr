@@ -62,21 +62,21 @@ sleep 15
 
 if [ "$IMPLICIT_CLUSTER" = true ] ; then
     # wait until all pods comes up running
-    TOTAL_PODS=`docker exec kubectl-support kubectl get pods --all-namespaces | grep "gatling" | grep "${GCP_K8_CLUSTER_NAMESPACE}" | wc -l`
+    TOTAL_PODS=`docker exec kubectl-support kubectl get pods --all-namespaces | grep "gatling" | grep "${GCP_K8_CLUSTER_NAMESPACE}" | grep "Running" | grep "1/1" | wc -l`
     # find better way to determine all pods running
     while [ "${TOTAL_PODS}" != "${ESTIMATED_NODES_1}" -a "${TOTAL_PODS}" != "${ESTIMATED_NODES_2}" ]
     do
        sleep 15
-       TOTAL_PODS=`docker exec kubectl-support kubectl get pods --all-namespaces | grep "gatling" | grep "${GCP_K8_CLUSTER_NAMESPACE}" | wc -l`
+       TOTAL_PODS=`docker exec kubectl-support kubectl get pods --all-namespaces | grep "gatling" | grep "${GCP_K8_CLUSTER_NAMESPACE}" | grep "Running" | grep "1/1" | wc -l`
     done
 else
     # wait until all pods comes up running
-    TOTAL_PODS=`docker exec kubectl-support kubectl get pods --all-namespaces | grep "gatling" | grep "${GCP_K8_CLUSTER_NAMESPACE}" | wc -l`
+    TOTAL_PODS=`docker exec kubectl-support kubectl get pods --all-namespaces | grep "gatling" | grep "${GCP_K8_CLUSTER_NAMESPACE}" | grep "Running" | grep "1/1" | wc -l`
     # find better way to determine all pods running
     while [ "${TOTAL_PODS}" != "${ESTIMATED_NODES_1}" -a "${TOTAL_PODS}" != "${ESTIMATED_NODES_2}" ]
     do
        sleep 15
-       TOTAL_PODS=`docker exec kubectl-support kubectl get pods --all-namespaces | grep "gatling" | grep "${GCP_K8_CLUSTER_NAMESPACE}" | wc -l`
+       TOTAL_PODS=`docker exec kubectl-support kubectl get pods --all-namespaces | grep "gatling" | grep "${GCP_K8_CLUSTER_NAMESPACE}" | grep "Running" | grep "1/1" | wc -l`
     done
 fi
 
