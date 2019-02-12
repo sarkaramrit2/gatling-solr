@@ -18,7 +18,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: gatling-solr
-  namespace: perftest
+  namespace: namespace_filler
 spec:
   selector:
     matchLabels:
