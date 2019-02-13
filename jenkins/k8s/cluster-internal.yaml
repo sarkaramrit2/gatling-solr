@@ -322,15 +322,3 @@ spec:
         ports:
         - containerPort: 80
           name: gatling-solr
-        volumeMounts:
-        - name: gatlingdata
-          mountPath: /opt/gatling/user-files/data/external
-  volumeClaimTemplates:
-  - metadata:
-      name: gatlingdata
-    spec:
-      accessModes:
-      - "ReadWriteOnce"
-      resources:
-        requests:
-          storage: "90Gi"
