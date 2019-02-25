@@ -2,7 +2,7 @@ package com.lucidworks.gatling.solr.request.builder
 
 import java.util
 
-import com.lucidworks.gatling.solr.action.{SolrIndexRequestActionBuilder, SolrIndexV2RequestActionBuilder, SolrQueryRequestActionBuilder}
+import com.lucidworks.gatling.solr.action._
 import io.gatling.core.session._
 import org.apache.solr.common.SolrInputDocument
 
@@ -29,5 +29,11 @@ case class SolrRequestBuilder(requestName: Expression[String]) {
 
   def indexV2[K, V](header: String, payload: util.ArrayList[SolrInputDocument]): SolrIndexV2RequestActionBuilder[K, V] =
     new SolrIndexV2RequestActionBuilder(SolrIndexV2Attributes(requestName, header, payload))
+
+  def managedQuery[K](payload: Expression[String]): ManagedSolrQueryRequestActionBuilder[K] =
+    new ManagedSolrQueryRequestActionBuilder(SolrQueryAttributes(requestName, payload))
+
+  def managedIndex[K, V](header: String, payload: util.ArrayList[SolrInputDocument]): ManagedSolrIndexRequestActionBuilder[K, V] =
+    new ManagedSolrIndexRequestActionBuilder(SolrIndexV2Attributes(requestName, header, payload))
 
 }
