@@ -47,7 +47,7 @@ class ManagedQuerySimulation extends Simulation {
   client.commit(false, true)
 
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
-  val solrConf = solr.zkhost(Config.zkHost).collection(Config.defaultCollection)
+  val solrConf = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection)
     .numClients(Config.numClients.toInt).properties(Config.prop)
 
   // A scenario where users execute queries
