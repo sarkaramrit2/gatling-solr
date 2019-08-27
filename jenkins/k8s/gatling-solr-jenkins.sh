@@ -291,4 +291,4 @@ else
 fi
 
 #delete gatling services
-docker exec kubectl-support kubectl delete -f /opt/cluster.yaml || echo "gatling service already created!!"
+docker exec kubectl-support kubectl delete -f /opt/cluster.yaml || echo "gatling service already deleted!!"
