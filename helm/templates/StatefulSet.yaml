@@ -1,30 +1,14 @@
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: gatling-solr
-  namespace: namespace_filler
-  labels:
-    app: gatling-solr
-spec:
-  ports:
-  - port: 80
-    name: gatling-solr
-  clusterIP: None
-  selector:
-    app: gatling-solr
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: gatling-solr
-  namespace: namespace_filler
+  namespace: {{ .Values.namespace }}
 spec:
   selector:
     matchLabels:
       app: gatling-solr # has to match .spec.template.metadata.labels
   serviceName: "gatling-solr"
-  replicas: gatling-nodes-replicas
+  replicas: {{ .Values.replicas }}
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: Parallel
@@ -35,8 +19,10 @@ spec:
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-      - name: gatling-solr
-        image: sarkaramrit2/gatling-solr:latest
-        ports:
-        - containerPort: 80
-          name: gatling-solr
+        - name: gatling-solr
+          image: {{ .Values.image }}
+          ports:
+            - containerPort: 80
+              name: gatling-solr
+          resources:
+{{ toYaml .Values.resources | indent 12 }}

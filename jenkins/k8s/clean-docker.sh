@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-#!/usr/bin/env bash
-
 # stop containers
 CID=`docker container ls -aq -f "name=kubectl-support"`
 if [ ! -z "${CID}" ]; then

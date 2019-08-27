@@ -310,6 +310,9 @@ spec:
       app: gatling-solr # has to match .spec.template.metadata.labels
   serviceName: "gatling-solr"
   replicas: gatling-nodes-replicas
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
   template:
     metadata:
       labels:
