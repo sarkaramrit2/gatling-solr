@@ -289,3 +289,6 @@ if [ "$IMPLICIT_CLUSTER" = true ] ; then
 else
     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
 fi
+
+#delete gatling services
+docker exec kubectl-support kubectl delete -f /opt/cluster.yaml || echo "gatling service already created!!"
