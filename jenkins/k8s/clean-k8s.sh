@@ -19,3 +19,7 @@ if [ "$IMPLICIT_CLUSTER" = true ] ; then
         done
     fi
 fi
+
+# delete gatling-solr service and statefulsets, redundant step
+docker exec kubectl-support kubectl delete statefulsets gatling-solr --namespace=${GCP_K8_CLUSTER_NAMESPACE} || echo "gatling statefulsets not available!!"
+docker exec kubectl-support kubectl delete service gatling-solr --namespace=${GCP_K8_CLUSTER_NAMESPACE} || echo "gatling service not available!!"
