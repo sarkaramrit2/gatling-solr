@@ -1,4 +1,4 @@
-FROM openjdk:11-jre
+FROM openjdk:11
 
 MAINTAINER Amrit Sarkar <sarkaramrit2@gmail.com>
 
@@ -7,7 +7,7 @@ WORKDIR /opt
 
 # gating version
 ENV GATLING_VERSION=3.0.0 \
-    SOLR_VERSION=7.5.0 \
+    SOLR_VERSION=8.1.1 \
     SCALA_VERSION=2.12.7 \
     SBT_VERSION=1.2.1 \
     GATLING_SOLR_BRANCH=variant_1
@@ -38,7 +38,7 @@ RUN apt-get update && \
     git clone https://github.com/sarkaramrit2/gatling-solr.git && \
     cd /tmp/downloads/gatling-solr/gatling-solr && \
     git checkout $GATLING_SOLR_BRANCH && \
-    sbt assembly && \
+    sbt clean assembly && \
     # install ps
     apt-get install procps -y && \
     cd /
