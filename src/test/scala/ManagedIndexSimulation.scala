@@ -2,9 +2,11 @@ import java.io.{BufferedReader, File, FileReader}
 import java.util
 import java.util.Properties
 
+import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
 import com.lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
+import org.apache.solr.client.solrj.impl.HttpClientUtil
 import org.apache.solr.common.SolrInputDocument
 
 import scala.concurrent.duration._
@@ -84,6 +86,16 @@ class ManagedIndexSimulation extends Simulation {
         .managedIndex(Config.header, feeder.next.get("record").get)) // provide appropriate header
     }
   }
+
+  val oauth2ClientId: String = System.getProperty("OAUTH2_CLIENT_ID")
+  val oauth2ClientSecret: String = System.getProperty("OAUTH2_CLIENT_SECRET")
+
+  // create http request interceptor and start it
+  val oauth2HttpRequestInterceptor: OAuth2HttpRequestInterceptor = new OAuth2HttpRequestInterceptorBuilder(oauth2ClientId, oauth2ClientSecret).build
+  oauth2HttpRequestInterceptor.start()
+
+  // register http request interceptor with solrj
+  HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
 
   // pass zookeeper string, default collection to index, poolSize for CloudSolrClients
   val solrConf = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection)

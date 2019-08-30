@@ -5,6 +5,10 @@ import io.gatling.core.Predef._
 import org.apache.solr.client.solrj.impl.CloudSolrClient
 
 import scala.concurrent.duration._
+import com.lucidworks.cloud.OAuth2HttpRequestInterceptor
+import com.lucidworks.cloud.OAuth2HttpRequestInterceptorBuilder
+import org.apache.solr.client.solrj.impl.HttpClientUtil
+// required information to access the managed search service// required information to access the managed search service
 
 class ManagedQuerySimulation extends Simulation {
 
@@ -41,6 +45,16 @@ class ManagedQuerySimulation extends Simulation {
         .managedQuery[String](Config.basequery))
     }
   }
+
+  val oauth2ClientId: String = System.getProperty("OAUTH2_CLIENT_ID")
+  val oauth2ClientSecret: String = System.getProperty("OAUTH2_CLIENT_SECRET")
+
+  // create http request interceptor and start it
+  val oauth2HttpRequestInterceptor: OAuth2HttpRequestInterceptor = new OAuth2HttpRequestInterceptorBuilder(oauth2ClientId, oauth2ClientSecret).build
+  oauth2HttpRequestInterceptor.start()
+
+  // register http request interceptor with solrj
+  HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
 
   val client = new CloudSolrClient.Builder().withZkHost(Config.zkHost).build()
   client.setDefaultCollection(Config.defaultCollection)

@@ -12,7 +12,7 @@ libraryDependencies ++= Seq(
   "io.gatling" % "gatling-app" % "3.0.1" % "provided",
   "io.gatling" % "gatling-recorder" % "3.0.1" % "provided",
   "com.opencsv" % "opencsv" % "4.4" % "provided",
-  ("org.apache.solr" % "solr-solrj" % "7.6.0")
+  ("org.apache.solr" % "solr-solrj" % "8.1.1")
     // Gatling contains slf4j-api
     .exclude("org.slf4j", "slf4j-api")
 )
