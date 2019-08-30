@@ -10,7 +10,7 @@ import com.lucidworks.cloud.OAuth2HttpRequestInterceptorBuilder
 import org.apache.solr.client.solrj.impl.HttpClientUtil
 // required information to access the managed search service// required information to access the managed search service
 
-class ManagedQuerySimulation extends Simulation {
+class ManagedRampUpQuerySimulation extends Simulation {
 
   object Config {
     import java.io.FileInputStream
