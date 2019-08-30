@@ -1,6 +1,6 @@
-import java.util.Properties
+import java.util.{Collections, Properties}
 
-import com.lucidworks.gatling.solr.Predef._
+import lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import org.apache.solr.client.solrj.impl.CloudSolrClient
 
@@ -28,7 +28,7 @@ class ManagedQuerySimulation extends Simulation {
     val totalTimeInMinutes = prop.getProperty("totalTimeInMinutes", "1")
     val basequery = prop.getProperty("basequery", "${params}&defType=edismax&qf=title description")
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
-    val solrUrl = prop.getProperty("solrUrl", "http://localhost:8983/solr")
+    val solrUrl = prop.getProperty("solrUrl", "https://staging.cloud.lucidworks.com/lucidworks/josh-test/solr/")
     val apiKey = prop.getProperty("apiKey", "--empty-here--")
     val defaultCollection = prop.getProperty("defaultCollection", "wiki")
     val numClients = prop.getProperty("numClients", "1")
@@ -46,8 +46,10 @@ class ManagedQuerySimulation extends Simulation {
     }
   }
 
-  val oauth2ClientId: String = System.getProperty("OAUTH2_CLIENT_ID")
-  val oauth2ClientSecret: String = System.getProperty("OAUTH2_CLIENT_SECRET")
+  val clientId = Option(System.getenv("OAUTH2_CLIENT_ID"))
+  val oauth2ClientId: String = if (clientId.isDefined) clientId.get else System.getProperty("OAUTH2_CLIENT_ID")
+  val clientSecret = Option(System.getenv("OAUTH2_CLIENT_SECRET"))
+  val oauth2ClientSecret: String = if (clientSecret.isDefined) clientSecret.get else System.getProperty("OAUTH2_CLIENT_SECRET")
 
   // create http request interceptor and start it
   val oauth2HttpRequestInterceptor: OAuth2HttpRequestInterceptor = new OAuth2HttpRequestInterceptorBuilder(oauth2ClientId, oauth2ClientSecret).build
@@ -56,7 +58,7 @@ class ManagedQuerySimulation extends Simulation {
   // register http request interceptor with solrj
   HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
 
-  val client = new CloudSolrClient.Builder().withZkHost(Config.zkHost).build()
+  val client = new CloudSolrClient.Builder(Collections.singletonList(Config.solrUrl)).build()
   client.setDefaultCollection(Config.defaultCollection)
   client.commit(false, true)
 

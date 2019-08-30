@@ -1,7 +1,7 @@
 import java.io.{File, FileReader}
 import java.util.{Properties, Scanner}
 
-import com.lucidworks.gatling.solr.Predef._
+import lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import org.apache.solr.client.solrj.impl.CloudSolrClient

@@ -1,10 +1,10 @@
-package com.lucidworks.gatling.solr.action
+package lucidworks.gatling.solr.action
 
-import java.nio.charset.Charset
 import java.util
+import java.util.Properties
 
-import com.lucidworks.gatling.solr.protocol.SolrProtocol
-import com.lucidworks.gatling.solr.request.builder.SolrQueryAttributes
+import lucidworks.gatling.solr.protocol.SolrProtocol
+import lucidworks.gatling.solr.utils.Constants
 import io.gatling.commons.stats.{KO, OK}
 import io.gatling.commons.util.DefaultClock
 import io.gatling.commons.validation.Validation
@@ -12,25 +12,26 @@ import io.gatling.core.CoreComponents
 import io.gatling.core.action.{Action, ExitableAction}
 import io.gatling.core.session._
 import io.gatling.core.util.NameGen
-import org.apache.http.client.utils.URLEncodedUtils
+import lucidworks.gatling.solr.protocol.SolrProtocol
+import lucidworks.gatling.solr.request.builder.SolrIndexAttributes
+import lucidworks.gatling.solr.utils.Constants
 import org.apache.solr.client.solrj.impl.CloudSolrClient
-import org.apache.solr.client.solrj.response.QueryResponse
-import org.apache.solr.common.params.ModifiableSolrParams
-
-import scala.collection.JavaConversions._
+import org.apache.solr.client.solrj.request.UpdateRequest
+import org.apache.solr.common.SolrInputDocument
 
 
-class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrClient],
-                                   val solrAttributes: SolrQueryAttributes[V],
+class SolrIndexRequestAction[K, V](val solrClients: util.ArrayList[CloudSolrClient],
+                                   val properties: Properties,
+                                   val solrAttributes: SolrIndexAttributes[K, V],
                                    val coreComponents: CoreComponents,
                                    val solrProtocol: SolrProtocol,
                                    val throttled: Boolean,
                                    val next: Action)
   extends ExitableAction with NameGen {
 
-  override val name = genName("solrQueryRequest")
   val statsEngine = coreComponents.statsEngine
   val clock = new DefaultClock
+  override val name = genName("solrIndexRequest")
 
   override def execute(session: Session): Unit = recover(session) {
 
@@ -40,6 +41,7 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
         sendRequest(
           requestName,
           solrClients.get((session.userId % solrClients.size).toInt), // round robin for solrclients
+          properties,
           solrAttributes,
           throttled,
           session)
@@ -57,23 +59,48 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
 
   private def sendRequest(requestName: String,
                           solrClient: CloudSolrClient,
-                          solrAttributes: SolrQueryAttributes[V],
+                          prop: Properties,
+                          solrAttributes: SolrIndexAttributes[K, V],
                           throttled: Boolean,
                           session: Session): Validation[Unit] = {
 
     solrAttributes payload session map { payload =>
 
-      val params = new ModifiableSolrParams();
-      for (param <- URLEncodedUtils.parse(payload, Charset.forName("UTF-8"))) {
-        params.add(param.getName, param.getValue)
+      val updateRequest = new UpdateRequest()
+      val fieldNames = solrAttributes.header.split(prop.getProperty(Constants.HEADER_SEP, ",")) // default comma
+
+      val lines = payload.split(prop.getProperty(Constants.LINES_SEP, "\n")) // default new line char
+      val docs = new util.ArrayList[SolrInputDocument]()
+
+      for (j <- 0 until lines.length) {
+        val doc = new SolrInputDocument()
+        val fieldValues = lines(j).split(prop.getProperty(Constants.FIELDVALUES_SEP, ",")) // default comma
+
+        for (i <- 0 until fieldNames.length) {
+          if (fieldValues.length - 1 >= i) {
+            doc.addField(fieldNames(i), fieldValues(i).trim);
+          }
+        }
+        docs.add(doc)
       }
 
+      updateRequest.add(docs)
+
       val requestStartDate = clock.nowMillis
-      var response: QueryResponse = null
+
       try {
-        response = solrClient.query(params)
-      }
-      catch {
+        solrClient.request(updateRequest)
+        val requestEndDate = clock.nowMillis
+        statsEngine.logResponse(
+          session,
+          requestName,
+          requestStartDate,
+          requestEndDate,
+          OK,
+          None,
+          None
+        )
+      } catch {
         case ex: Exception => {
           val requestEndDate = clock.nowMillis
           statsEngine.logResponse(
@@ -85,23 +112,14 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
             None,
             Option(ex.getMessage)
           )
-          next ! session
+
         }
       }
-      val requestEndDate = clock.nowMillis
 
-      if (response != null) {
-        statsEngine.logResponse(
-          session,
-          requestName,
-          startTimestamp = requestStartDate,
-          endTimestamp = requestEndDate,
-          if (response.getException == null) OK else KO,
-          None,
-          if (response.getException == null) None else Some(response.getException.getMessage)
-        )
-      }
       next ! session
+
     }
+
   }
+
 }

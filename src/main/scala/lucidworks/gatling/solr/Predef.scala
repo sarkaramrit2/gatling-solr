@@ -1,9 +1,10 @@
-package com.lucidworks.gatling.solr
+package lucidworks.gatling.solr
 
-import com.lucidworks.gatling.solr.protocol.SolrProtocolBuilder
-import com.lucidworks.gatling.solr.request.builder.SolrRequestBuilder
+import lucidworks.gatling.solr.protocol.SolrProtocolBuilder
 import io.gatling.core.config.GatlingConfiguration
 import io.gatling.core.session.Expression
+import lucidworks.gatling.solr.protocol.SolrProtocolBuilder
+import lucidworks.gatling.solr.request.builder.SolrRequestBuilder
 
 
 object Predef {

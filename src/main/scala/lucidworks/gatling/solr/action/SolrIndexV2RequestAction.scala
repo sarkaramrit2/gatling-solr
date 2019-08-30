@@ -1,16 +1,18 @@
-package com.lucidworks.gatling.solr.action
+package lucidworks.gatling.solr.action
 
 import java.util
 import java.util.Properties
 
-import com.lucidworks.gatling.solr.protocol.SolrProtocol
-import com.lucidworks.gatling.solr.request.builder.SolrIndexV2Attributes
+import lucidworks.gatling.solr.protocol.SolrProtocol
+import lucidworks.gatling.solr.request.builder.SolrIndexV2Attributes
 import io.gatling.commons.stats.{KO, OK}
 import io.gatling.commons.util.DefaultClock
 import io.gatling.core.CoreComponents
 import io.gatling.core.action.{Action, ExitableAction}
 import io.gatling.core.session._
 import io.gatling.core.util.NameGen
+import lucidworks.gatling.solr.protocol.SolrProtocol
+import lucidworks.gatling.solr.request.builder.SolrIndexV2Attributes
 import org.apache.solr.client.solrj.impl.CloudSolrClient
 import org.apache.solr.client.solrj.request.UpdateRequest
 

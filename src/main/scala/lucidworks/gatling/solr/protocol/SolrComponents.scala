@@ -1,4 +1,4 @@
-package com.lucidworks.gatling.solr.protocol
+package lucidworks.gatling.solr.protocol
 
 import io.gatling.core.protocol.ProtocolComponents
 import io.gatling.core.session.Session

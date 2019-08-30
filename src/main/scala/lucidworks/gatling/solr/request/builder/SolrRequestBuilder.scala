@@ -1,9 +1,10 @@
-package com.lucidworks.gatling.solr.request.builder
+package lucidworks.gatling.solr.request.builder
 
 import java.util
 
-import com.lucidworks.gatling.solr.action._
+import lucidworks.gatling.solr.action._
 import io.gatling.core.session._
+import lucidworks.gatling.solr.action.{ManagedSolrIndexRequestActionBuilder, ManagedSolrQueryRequestActionBuilder, SolrIndexRequestActionBuilder, SolrIndexV2RequestActionBuilder, SolrQueryRequestActionBuilder}
 import org.apache.solr.common.SolrInputDocument
 
 case class SolrQueryAttributes[K](requestName: Expression[String],

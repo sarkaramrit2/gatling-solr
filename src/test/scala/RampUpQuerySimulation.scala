@@ -1,6 +1,6 @@
 import java.util.Properties
 
-import com.lucidworks.gatling.solr.Predef._
+import lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import org.apache.solr.client.solrj.impl.CloudSolrClient
 

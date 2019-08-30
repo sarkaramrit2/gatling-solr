@@ -1,12 +1,13 @@
-package com.lucidworks.gatling.solr.action
+package lucidworks.gatling.solr.action
 
 import java.util
 
-import com.lucidworks.gatling.solr.protocol.{SolrComponents, SolrProtocol}
-import com.lucidworks.gatling.solr.request.builder.SolrQueryAttributes
+import lucidworks.gatling.solr.protocol.{SolrComponents, SolrProtocol}
 import io.gatling.core.action.Action
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.structure.ScenarioContext
+import lucidworks.gatling.solr.protocol.{SolrComponents, SolrProtocol}
+import lucidworks.gatling.solr.request.builder.SolrQueryAttributes
 import org.apache.solr.client.solrj.impl.CloudSolrClient
 
 

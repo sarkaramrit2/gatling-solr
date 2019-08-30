@@ -3,7 +3,7 @@ import java.util
 import java.util.Properties
 
 import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
-import com.lucidworks.gatling.solr.Predef._
+import lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import org.apache.solr.client.solrj.impl.HttpClientUtil
@@ -87,8 +87,10 @@ class ManagedIndexSimulation extends Simulation {
     }
   }
 
-  val oauth2ClientId: String = System.getProperty("OAUTH2_CLIENT_ID")
-  val oauth2ClientSecret: String = System.getProperty("OAUTH2_CLIENT_SECRET")
+  val clientId = Option(System.getenv("OAUTH2_CLIENT_ID"))
+  val oauth2ClientId: String = if (clientId.isDefined) clientId.get else System.getProperty("OAUTH2_CLIENT_ID")
+  val clientSecret = Option(System.getenv("OAUTH2_CLIENT_SECRET"))
+  val oauth2ClientSecret: String = if (clientSecret.isDefined) clientSecret.get else System.getProperty("OAUTH2_CLIENT_SECRET")
 
   // create http request interceptor and start it
   val oauth2HttpRequestInterceptor: OAuth2HttpRequestInterceptor = new OAuth2HttpRequestInterceptorBuilder(oauth2ClientId, oauth2ClientSecret).build

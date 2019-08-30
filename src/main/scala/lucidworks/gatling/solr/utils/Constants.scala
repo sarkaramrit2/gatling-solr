@@ -1,4 +1,4 @@
-package com.lucidworks.gatling.solr.utils
+package lucidworks.gatling.solr.utils
 
 object Constants {
 
