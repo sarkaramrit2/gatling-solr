@@ -2,7 +2,6 @@ package lucidworks.gatling.solr.action
 
 import java.util
 
-import lucidworks.gatling.solr.protocol.{SolrComponents, SolrProtocol}
 import io.gatling.core.action.Action
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.structure.ScenarioContext
