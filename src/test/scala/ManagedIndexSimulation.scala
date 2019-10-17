@@ -31,7 +31,7 @@ class ManagedIndexSimulation extends Simulation {
     val totalTimeInMinutes = prop.getProperty("totalTimeInMinutes", "34")
     val indexBatchSize = prop.getProperty("indexBatchSize", "5000")
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
-    val solrUrl = prop.getProperty("solrUrl", "http://localhost:8983/solr")
+    val solrUrl = prop.getProperty("solrUrl", "http://localhost:8983/solr/")
     val defaultCollection = prop.getProperty("defaultCollection", "wiki")
     val header = prop.getProperty("header", "id,title,time,description")
     val headerSep = prop.getProperty("header.sep", ",")

@@ -28,7 +28,7 @@ class ManagedQuerySimulation extends Simulation {
     val totalTimeInMinutes = prop.getProperty("totalTimeInMinutes", "1")
     val basequery = prop.getProperty("basequery", "${params}&defType=edismax&qf=title description")
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
-    val solrUrl = prop.getProperty("solrUrl", "https://staging.cloud.lucidworks.com/lucidworks/andrew-test/solr/")
+    val solrUrl = prop.getProperty("solrUrl", "http://localhost:8983/solr/")
     val apiKey = prop.getProperty("apiKey", "--empty-here--")
     val defaultCollection = prop.getProperty("defaultCollection", "test")
     val numClients = prop.getProperty("numClients", "1")
