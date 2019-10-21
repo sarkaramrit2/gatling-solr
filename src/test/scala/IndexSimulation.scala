@@ -32,6 +32,7 @@ class IndexSimulation extends Simulation {
     val defaultCollection = prop.getProperty("defaultCollection", "wiki")
     val header = prop.getProperty("header", "title,time,description")
     val headerSep = prop.getProperty("header.sep", ",")
+    val multiParamSep = prop.getProperty("multiParam.sep", "\t")
     val fieldValuesSep = prop.getProperty("fieldValues.sep", ",")
     val numClients = prop.getProperty("numClients", "9")
 
@@ -58,7 +59,10 @@ class IndexSimulation extends Simulation {
 
         for (i <- 0 until fieldNames.length) {
           if (fieldValues.length - 1 >= i) {
-            doc.addField(fieldNames(i), fieldValues(i).trim);
+            val multiValues = fieldValues(i).trim.split(Config.multiParamSep);
+            for (i <- 0 until multiValues.length) {
+              doc.addField(fieldNames(i), multiValues(i).trim);
+            }
           }
         }
         records.add(doc)
