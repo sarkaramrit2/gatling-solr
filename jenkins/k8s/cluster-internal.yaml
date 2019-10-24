@@ -287,28 +287,28 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: gatling-solr
+  name: gatlingsolr
   namespace: namespace_filler
   labels:
-    app: gatling-solr
+    app: gatlingsolr
 spec:
   ports:
   - port: 80
-    name: gatling-solr
+    name: gatlingsolr
   clusterIP: None
   selector:
-    app: gatling-solr
+    app: gatlingsolr
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: gatling-solr
+  name: gatlingsolr
   namespace: namespace_filler
 spec:
   selector:
     matchLabels:
-      app: gatling-solr # has to match .spec.template.metadata.labels
-  serviceName: "gatling-solr"
+      app: gatlingsolr # has to match .spec.template.metadata.labels
+  serviceName: "gatlingsolr"
   replicas: gatling-nodes-replicas
   updateStrategy:
     type: RollingUpdate
@@ -316,12 +316,17 @@ spec:
   template:
     metadata:
       labels:
-        app: gatling-solr # has to match .spec.selector.matchLabels
+        app: gatlingsolr # has to match .spec.selector.matchLabels
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-      - name: gatling-solr
+      - name: gatlingsolr
         image: sarkaramrit2/gatling-solr:latest
         ports:
         - containerPort: 80
-          name: gatling-solr
+          name: gatlingsolr
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name

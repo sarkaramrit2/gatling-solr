@@ -16,4 +16,3 @@ fi
 IMG_ID=`docker images -a | grep "kubectl-support" | awk '{print $3}'`
 if [ ! -z "${IMG_ID}" ]; then
     docker rmi -f ${IMG_ID}
-fi
