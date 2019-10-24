@@ -10,7 +10,9 @@ import org.apache.http.protocol.HttpContext
 import org.apache.solr.client.solrj.impl.{CloudSolrClient, HttpClientUtil}
 import java.util.Base64
 import java.util.Collections
+import java.util.concurrent.TimeUnit
 
+import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
 import lucidworks.gatling.solr.protocol.{SolrComponents, SolrProtocol}
 import lucidworks.gatling.solr.request.builder.SolrIndexV2Attributes
 
@@ -23,18 +25,9 @@ class ManagedSolrIndexRequestActionBuilder[K, V](solrAttributes: SolrIndexV2Attr
     val solrComponents: SolrComponents = protocolComponentsRegistry.components(SolrProtocol.SolrProtocolKey)
 
     val solrClients = new util.ArrayList[CloudSolrClient]()
-
-    val cred = Base64.getEncoder.encodeToString((solrComponents.solrProtocol.apikey + ":x").getBytes)
-    HttpClientUtil.addRequestInterceptor((request: HttpRequest, context: HttpContext) => {
-      def foo(request: HttpRequest, context: HttpContext) = request.setHeader("Authorization", "Basic " + cred)
-      foo(request, context)
-    })
-
     for( i <- 0 until solrComponents.solrProtocol.numClients){
-
-      var solrClient= null: CloudSolrClient;
-      val client = HttpClientUtil.createClient(null)
-      solrClient = new CloudSolrClient.Builder(Collections.singletonList(solrComponents.solrProtocol.solrurl)).withHttpClient(client).build
+      var solrClient= null: CloudSolrClient
+      solrClient = new CloudSolrClient.Builder(Collections.singletonList(solrComponents.solrProtocol.solrurl)).build
       solrClient.setDefaultCollection(solrComponents.solrProtocol.collection)
       solrClients.add(solrClient)
     }

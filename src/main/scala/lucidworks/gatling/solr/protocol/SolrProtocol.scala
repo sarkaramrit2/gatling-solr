@@ -9,6 +9,9 @@ import io.gatling.core.protocol.{Protocol, ProtocolKey}
 object SolrProtocol {
 
   def apply(configuration: GatlingConfiguration): SolrProtocol = SolrProtocol(
+    authClientId = "",
+    authClientSecret = "",
+    customerId = "",
     zkhost = "",
     solrurl = "",
     apikey = "",
@@ -40,12 +43,21 @@ object SolrProtocol {
 }
 
 case class SolrProtocol(
+                         authClientId: String,
+                         authClientSecret: String,
+                         customerId: String,
                          zkhost: String,
                          solrurl: String,
                          apikey: String,
                          collection: String,
                          properties: Properties,
                          numClients: Int) extends Protocol {
+
+  def authClientId(authClientId: String): SolrProtocol = copy(authClientId = authClientId)
+
+  def authClientSecret(authClientSecret: String): SolrProtocol = copy(authClientSecret = authClientSecret)
+
+  def customerId(customerId: String): SolrProtocol = copy(customerId = customerId)
 
   def zkhost(zkhost: String): SolrProtocol = copy(zkhost = zkhost)
 

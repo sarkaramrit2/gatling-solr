@@ -1,8 +1,10 @@
 package lucidworks.gatling.solr.action
 
 import java.util
+import java.util.concurrent.TimeUnit
 import java.util.{Base64, Collections}
 
+import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
 import io.gatling.core.action.Action
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.structure.ScenarioContext
@@ -22,20 +24,15 @@ class ManagedSolrQueryRequestActionBuilder[K](solrAttributes: SolrQueryAttribute
 
     val solrClients = new util.ArrayList[CloudSolrClient]()
 
-    val cred = Base64.getEncoder.encodeToString((solrComponents.solrProtocol.apikey + ":x").getBytes)
-    HttpClientUtil.addRequestInterceptor((request: HttpRequest, context: HttpContext) => {
-      def foo(request: HttpRequest, context: HttpContext) = request.setHeader("Authorization", "Basic " + cred)
-      foo(request, context)
-    })
+    var solrClient = null: CloudSolrClient;
+    // create http request interceptor and start it
 
-    var solrClient= null: CloudSolrClient;
-    val client = HttpClientUtil.createClient(null)
-    solrClient = new CloudSolrClient.Builder(Collections.singletonList(solrComponents.solrProtocol.solrurl)).withHttpClient(client).build
+    solrClient = new CloudSolrClient.Builder(Collections.singletonList(solrComponents.solrProtocol.solrurl)).build
     solrClient.setDefaultCollection(solrComponents.solrProtocol.collection)
     solrClients.add(solrClient)
 
     coreComponents.actorSystem.registerOnTermination(
-      for( i <- 0 until solrComponents.solrProtocol.numClients){
+      for (i <- 0 until solrComponents.solrProtocol.numClients) {
         solrClients.get(i).close()
       }
     )

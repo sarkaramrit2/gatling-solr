@@ -1,3 +1,4 @@
+import java.util.concurrent.TimeUnit
 import java.util.{Collections, Properties}
 
 import lucidworks.gatling.solr.Predef._
@@ -50,10 +51,13 @@ class ManagedQuerySimulation extends Simulation {
   val oauth2ClientId: String = if (clientId.isDefined) clientId.get else System.getProperty("OAUTH2_CLIENT_ID")
   val clientSecret = Option(System.getenv("OAUTH2_CLIENT_SECRET"))
   val oauth2ClientSecret: String = if (clientSecret.isDefined) clientSecret.get else System.getProperty("OAUTH2_CLIENT_SECRET")
+  val customerId = Option(System.getenv("CUSTOMER_ID"))
+  val oauth2CustomerId: String = if (clientSecret.isDefined) customerId.get else System.getProperty("CUSTOMER_ID")
 
   // create http request interceptor and start it
-  val oauth2HttpRequestInterceptor: OAuth2HttpRequestInterceptor = new OAuth2HttpRequestInterceptorBuilder(oauth2ClientId, oauth2ClientSecret).build
+  val oauth2HttpRequestInterceptor: OAuth2HttpRequestInterceptor = new OAuth2HttpRequestInterceptorBuilder(oauth2CustomerId, oauth2ClientId, oauth2ClientSecret).build
   oauth2HttpRequestInterceptor.start()
+  oauth2HttpRequestInterceptor.awaitFirstRefresh(60, TimeUnit.SECONDS);
 
   // register http request interceptor with solrj
   HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
@@ -63,7 +67,8 @@ class ManagedQuerySimulation extends Simulation {
   client.commit(false, true)
 
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
-  val solrConf = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection)
+  val solrConf = solr.customerId(oauth2CustomerId).authClientId(oauth2ClientId).authClientSecret(oauth2ClientSecret).
+    solrurl(Config.solrUrl).collection(Config.defaultCollection)
     .numClients(Config.numClients.toInt).properties(Config.prop)
 
   // A scenario where users execute queries
