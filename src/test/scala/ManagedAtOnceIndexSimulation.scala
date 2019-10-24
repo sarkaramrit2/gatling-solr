@@ -3,16 +3,16 @@ import java.util
 import java.util.Properties
 
 import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
-import lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
+import lucidworks.gatling.solr.Predef._
 import org.apache.solr.client.solrj.impl.HttpClientUtil
 import org.apache.solr.common.SolrInputDocument
 
 import scala.concurrent.duration._
 
 
-class ManagedConstantUsersIndexSimulation extends Simulation {
+class ManagedAtOnceIndexSimulation extends Simulation {
 
   object Config {
 
@@ -35,7 +35,7 @@ class ManagedConstantUsersIndexSimulation extends Simulation {
     val defaultCollection = prop.getProperty("defaultCollection", "wiki")
     val header = prop.getProperty("header", "id,title,time,description")
     val headerSep = prop.getProperty("header.sep", ",")
-    val multiParamSep = prop.getProperty("multiParam.sep", "\t")
+    val multiParamSep = prop.getProperty("multiParam.sep", null)
     val fieldValuesSep = prop.getProperty("fieldValues.sep", ",")
     val numClients = prop.getProperty("numClients", "9")
     val oauth2CustomerId = prop.getProperty("CUSTOMER_ID", "lucidworks")
@@ -63,9 +63,14 @@ class ManagedConstantUsersIndexSimulation extends Simulation {
 
         for (i <- 0 until fieldNames.length) {
           if (fieldValues.length - 1 >= i) {
-            val multiValues = fieldValues(i).trim.split(Config.multiParamSep);
-            for (i <- 0 until multiValues.length) {
-              doc.addField(fieldNames(i), multiValues(i).trim);
+            if (Config.multiParamSep != null) {
+              val multiValues = fieldValues(i).trim.split(Config.multiParamSep);
+              for (i <- 0 until multiValues.length) {
+                doc.addField(fieldNames(i), multiValues(i).trim);
+              }
+            }
+            else {
+              doc.addField(fieldNames(i), fieldValues(i))
             }
           }
         }
@@ -113,7 +118,7 @@ class ManagedConstantUsersIndexSimulation extends Simulation {
 
   setUp(
     users.inject(
-      constantUsersPerSec(Config.maxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
+      atOnceUsers(Config.maxNumUsers.toInt))
   ).protocols(solrConf)
 
 }

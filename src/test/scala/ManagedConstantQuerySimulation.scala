@@ -11,7 +11,7 @@ import com.lucidworks.cloud.OAuth2HttpRequestInterceptorBuilder
 import org.apache.solr.client.solrj.impl.HttpClientUtil
 // required information to access the managed search service// required information to access the managed search service
 
-class ManagedQuerySimulation extends Simulation {
+class ManagedConstantQuerySimulation extends Simulation {
 
   object Config {
     import java.io.FileInputStream
@@ -75,8 +75,6 @@ class ManagedQuerySimulation extends Simulation {
 
   setUp(
     users.inject(
-      constantUsersPerSec(Config.maxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))//,
-      //rampUsersPerSec(Config.minNumUsers.toDouble) to Config.maxNumUsers.toDouble during
-        //(Config.totalTimeInMinutes.toDouble minutes))
+      constantUsersPerSec(Config.maxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
   ).protocols(solrConf)
 }
