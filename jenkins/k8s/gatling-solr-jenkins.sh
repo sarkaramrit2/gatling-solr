@@ -56,6 +56,9 @@ docker exec kubectl-support kubectl delete statefulsets gatlingsolr --namespace=
 docker exec kubectl-support kubectl delete service gatlingsolr --namespace=${GCP_K8_CLUSTER_NAMESPACE} || echo "gatling service not available!!"
 sleep 10
 
+# create oauth2 secrets
+docker exec kubectl-support kubectl get secret okta-api-token --namespace=default --export -o yaml | kubectl apply --namespace=${GCP_K8_CLUSTER_NAMESPACE} -f -
+
 docker exec kubectl-support kubectl create -f /opt/cluster.yaml || echo "gatling service already created!!"
 # buffer sleep for 3 mins to get the pods ready, and then check
 sleep 15
