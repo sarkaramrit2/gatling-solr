@@ -57,7 +57,11 @@ docker exec kubectl-support kubectl delete service gatlingsolr --namespace=${GCP
 sleep 10
 
 # create oauth2 secrets
-docker exec kubectl-support kubectl get secret oauth2 --namespace=default --export -o yaml | docker exec kubectl-support kubectl apply --namespace=${GCP_K8_CLUSTER_NAMESPACE} -f -
+docker exec kubectl-support kubectl get secret oauth2 --namespace=default --export -o yaml >> secrets.yaml
+docker cp secrets.yaml ${CID}:/opt/secrets.yaml
+docker exec kubectl-support kubectl apply --namespace=${GCP_K8_CLUSTER_NAMESPACE} -f /opt/secrets.yaml
+docker exec kubectl-support rm -rf /opt/secrets.yaml
+rm -rf secrets.yaml
 
 docker exec kubectl-support kubectl create -f /opt/cluster.yaml || echo "gatling service already created!!"
 # buffer sleep for 3 mins to get the pods ready, and then check
