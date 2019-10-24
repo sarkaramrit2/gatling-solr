@@ -39,18 +39,52 @@ class ManagedAtOnceIndexSimulation extends Simulation {
     val fieldValuesSep = prop.getProperty("fieldValues.sep", ",")
     val numClients = prop.getProperty("numClients", "9")
     val oauth2CustomerId = prop.getProperty("CUSTOMER_ID", "lucidworks")
-
+    val parallelNodes = prop.getProperty("parallelNodes", "1")
+    val totalFiles = prop.getProperty("totalFiles", "1")
+    val podNo = if (System.getenv("POD_NAME") != null) {
+      System.getenv("POD_NAME")
+    }
+    else {
+      "gatlingsolr-1"
+    }.split("-")(1)
   }
 
   val solrIndexV2Feeder = new Feeder[util.ArrayList[SolrInputDocument]] {
 
-    private var indexFile = new File(Config.indexFilePath)
+    private var podNo = Config.podNo.toInt
+    private var indexFile: File = _
+    if (Config.totalFiles.toInt <= 1)  {
+      indexFile = new File(Config.indexFilePath)
+    }
+    else {
+      System.out.println("indexFile: " + Config.indexFilePath + Config.podNo)
+      indexFile = new File(Config.indexFilePath + Config.podNo)
+    }
+
     private var fileReader = new FileReader(indexFile)
     private var reader = new BufferedReader(fileReader)
-
     private var hasNextLine = ""
 
-    override def hasNext = hasNextLine != null
+    override def hasNext = if (hasNextLine == null) {
+      if (Config.totalFiles.toInt <= 1) {
+        false
+    }
+      else {
+        if (podNo + Config.parallelNodes.toInt > Config.totalFiles.toInt) {
+          false
+        }
+        else {
+          podNo = podNo + Config.parallelNodes.toInt
+          indexFile = new File(Config.indexFilePath + Config.podNo)
+          fileReader = new FileReader(indexFile)
+          reader = new BufferedReader(fileReader)
+          true
+        }
+      }
+    }
+    else {
+      true
+    }
 
     override def next: Map[String, util.ArrayList[SolrInputDocument]] = {
       var batchSize = Config.indexBatchSize.toInt
@@ -96,6 +130,8 @@ class ManagedAtOnceIndexSimulation extends Simulation {
         .managedIndex(Config.header, feeder.next.get("record").get)) // provide appropriate header
     }
   }
+
+  System.out.println("pod name: " + System.getenv("POD_NAME"))
 
   val clientId = Option(System.getenv("OAUTH2_CLIENT_ID"))
   val oauth2ClientId: String = if (clientId.isDefined) clientId.get else System.getProperty("OAUTH2_CLIENT_ID")
