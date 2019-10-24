@@ -12,7 +12,7 @@ import org.apache.solr.common.SolrInputDocument
 import scala.concurrent.duration._
 
 
-class ManagedIndexSimulation extends Simulation {
+class ManagedConstantUsersIndexSimulation extends Simulation {
 
   object Config {
 
