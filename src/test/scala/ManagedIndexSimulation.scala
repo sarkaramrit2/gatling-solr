@@ -38,6 +38,7 @@ class ManagedIndexSimulation extends Simulation {
     val multiParamSep = prop.getProperty("multiParam.sep", "\t")
     val fieldValuesSep = prop.getProperty("fieldValues.sep", ",")
     val numClients = prop.getProperty("numClients", "9")
+    val oauth2CustomerId = prop.getProperty("CUSTOMER_ID", "lucidworks")
 
   }
 
@@ -95,11 +96,9 @@ class ManagedIndexSimulation extends Simulation {
   val oauth2ClientId: String = if (clientId.isDefined) clientId.get else System.getProperty("OAUTH2_CLIENT_ID")
   val clientSecret = Option(System.getenv("OAUTH2_CLIENT_SECRET"))
   val oauth2ClientSecret: String = if (clientSecret.isDefined) clientSecret.get else System.getProperty("OAUTH2_CLIENT_SECRET")
-  val customerId = Option(System.getenv("CUSTOMER_ID"))
-  val oauth2CustomerId: String = if (clientSecret.isDefined) customerId.get else System.getProperty("CUSTOMER_ID")
 
   // create http request interceptor and start it
-  val oauth2HttpRequestInterceptor: OAuth2HttpRequestInterceptor = new OAuth2HttpRequestInterceptorBuilder(oauth2CustomerId, oauth2ClientId, oauth2ClientSecret).build
+  val oauth2HttpRequestInterceptor: OAuth2HttpRequestInterceptor = new OAuth2HttpRequestInterceptorBuilder(Config.oauth2CustomerId, oauth2ClientId, oauth2ClientSecret).build
   oauth2HttpRequestInterceptor.start()
 
   // register http request interceptor with solrj
