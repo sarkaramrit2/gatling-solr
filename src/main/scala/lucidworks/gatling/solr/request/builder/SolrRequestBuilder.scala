@@ -28,6 +28,9 @@ case class SolrRequestBuilder(requestName: Expression[String]) {
   def index[K, V](header: String, payload: Expression[String]): SolrIndexRequestActionBuilder[K, V] =
     new SolrIndexRequestActionBuilder(SolrIndexAttributes(requestName, header, payload))
 
+  def managedIndexV1[K, V](header: String, payload: Expression[String]): ManagedSolrIndexV1RequestActionBuilder[K, V] =
+    new ManagedSolrIndexV1RequestActionBuilder(SolrIndexAttributes(requestName, header, payload))
+
   def indexV2[K, V](header: String, payload: util.ArrayList[SolrInputDocument]): SolrIndexV2RequestActionBuilder[K, V] =
     new SolrIndexV2RequestActionBuilder(SolrIndexV2Attributes(requestName, header, payload))
 

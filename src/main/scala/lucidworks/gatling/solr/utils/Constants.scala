@@ -6,5 +6,6 @@ object Constants {
   val HEADER_SEP = "header.sep"
   val FIELDVALUES_SEP = "fieldValues.sep"
   val LINES_SEP = "lines.sep"
+  val MULTIPARAM_SEP= "multiParam.sep"
 
 }

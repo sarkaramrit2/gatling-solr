@@ -1,18 +1,14 @@
-import java.io.{BufferedReader, File, FileReader}
-import java.util
-import java.util.Properties
+import java.io.{File, FileReader}
+import java.util.{Properties, Scanner}
 
 import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import lucidworks.gatling.solr.Predef._
 import org.apache.solr.client.solrj.impl.HttpClientUtil
-import org.apache.solr.common.SolrInputDocument
+import scala.concurrent.duration.DurationDouble
 
-import scala.concurrent.duration._
-
-
-class ManagedAtOnceIndexSimulation extends Simulation {
+class ManagedConstantIndexV1Simulation extends Simulation {
 
   object Config {
 
@@ -43,17 +39,17 @@ class ManagedAtOnceIndexSimulation extends Simulation {
     val totalFiles = prop.getProperty("totalFiles", "1")
     val podNo = if (System.getenv("POD_NAME") != null) {
       System.getenv("POD_NAME")
-    }.split("-")(1)
+      }.split("-")(1)
     else {
       "gatlingsolr-0"
-    }.split("-")(1)
+      }.split("-")(1)
   }
 
-  val solrIndexV2Feeder = new Feeder[util.ArrayList[SolrInputDocument]] {
+  val solrIndexV1Feeder = new Feeder[String] {
 
     private var podNo = Config.podNo.toInt
     private var indexFile: File = _
-    if (Config.totalFiles.toInt <= 1)  {
+    if (Config.totalFiles.toInt <= 1) {
       System.out.println("indexFile: " + Config.indexFilePath)
       indexFile = new File(Config.indexFilePath)
     }
@@ -63,10 +59,9 @@ class ManagedAtOnceIndexSimulation extends Simulation {
     }
 
     private var fileReader = new FileReader(indexFile)
-    private var reader = new BufferedReader(fileReader)
-    private var hasNextLine = ""
+    private var scanner = new Scanner(fileReader)
 
-    override def hasNext = if (hasNextLine == null) {
+    override def hasNext = if (!scanner.hasNext) {
       if (Config.totalFiles.toInt <= 1) {
         false
       }
@@ -78,7 +73,7 @@ class ManagedAtOnceIndexSimulation extends Simulation {
           podNo = podNo + Config.parallelNodes.toInt
           indexFile = new File(Config.indexFilePath + Config.podNo)
           fileReader = new FileReader(indexFile)
-          reader = new BufferedReader(fileReader)
+          scanner = new Scanner(fileReader)
           true
         }
       }
@@ -87,48 +82,30 @@ class ManagedAtOnceIndexSimulation extends Simulation {
       true
     }
 
-    override def next: Map[String, util.ArrayList[SolrInputDocument]] = {
+    override def next: Map[String, String] = {
       var batchSize = Config.indexBatchSize.toInt
-      val records = new util.ArrayList[SolrInputDocument]()
-      var record = reader.readLine()
-      while (batchSize > 0 && record != null) {
-        val doc = new SolrInputDocument()
-        val fieldNames = Config.header.split(Config.headerSep) // default comma
-        val fieldValues = record.split(Config.fieldValuesSep) // default comma
-
-        for (i <- 0 until fieldNames.length) {
-          if (fieldValues.length - 1 >= i) {
-            if (Config.multiParamSep != null) {
-              val multiValues = fieldValues(i).trim.split(Config.multiParamSep);
-              for (j <- 0 until multiValues.length) {
-                doc.addField(fieldNames(i), multiValues(j).trim);
-              }
-            }
-            else {
-              doc.addField(fieldNames(i), fieldValues(i))
-            }
-          }
-        }
-        records.add(doc)
+      var record = ""
+      while (batchSize > 0) {
+        record += scanner.nextLine()
         batchSize = batchSize - 1
-        record = reader.readLine()
+        if (batchSize > 0) {
+          record += '\n'
+        }
       }
 
-      hasNextLine = record
-      System.out.println("records: " + records)
       Map(
-        "record" -> records)
+        "record" -> record)
     }
   }
 
   object Index {
     // construct a feeder for content stored in CSV file
-    val feeder = solrIndexV2Feeder
+    val feeder = solrIndexV1Feeder
 
     // each user sends batches
     val search = repeat(Config.numBatchesPerUser) {
-      feed(feeder).exec(solr("managedSearchIndexRequest")
-        .managedIndex(Config.header, feeder.next.get("record").get)) // provide appropriate header
+      feed(feeder).exec(solr("managedSearchIndexV1Request")
+        .managedIndexV1(Config.header, "${record}")) // provide appropriate header
     }
   }
 
@@ -155,7 +132,7 @@ class ManagedAtOnceIndexSimulation extends Simulation {
 
   setUp(
     users.inject(
-      atOnceUsers(Config.maxNumUsers.toInt))
+      constantUsersPerSec(Config.maxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
   ).protocols(solrConf)
 
 }
