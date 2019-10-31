@@ -68,7 +68,7 @@ class ManagedAtOnceIndexSimulation extends Simulation {
     override def hasNext = if (hasNextLine == null) {
       if (Config.totalFiles.toInt <= 1) {
         false
-    }
+      }
       else {
         if (podNo + Config.parallelNodes.toInt > Config.totalFiles.toInt) {
           false
