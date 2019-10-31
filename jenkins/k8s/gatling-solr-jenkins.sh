@@ -171,7 +171,7 @@ if [ ! -z "${QUERY_FEEDER_FILE}" ]; then
     echo "Found ENV{QUERY_FEEDER_FILE}=${QUERY_FEEDER_FILE} -- but ./QUERY_FEEDER_FILE not found, jenkins bug?" && exit -1;
   fi
   echo "Copying user supplied patch to workspace/data/${QUERY_FEEDER_FILE}"
-  cp ./INDEX_FEEDER_FILE ./workspace/data/${QUERY_FEEDER_FILE}
+  cp ./QUERY_FEEDER_FILE ./workspace/data/${QUERY_FEEDER_FILE}
 
   # copy the data from local to dockers
   docker cp ./workspace/configs/${QUERY_FEEDER_FILE} ${CID}:/opt/${QUERY_FEEDER_FILE}
@@ -180,7 +180,7 @@ if [ ! -z "${QUERY_FEEDER_FILE}" ]; then
     docker exec kubectl-support kubectl cp /opt/${QUERY_FEEDER_FILE} ${GCP_K8_CLUSTER_NAMESPACE}/gatlingsolr-${c}:/opt/gatling/user-files/data/${QUERY_FEEDER_FILE}
   done
 else
-  rm -rf ./INDEX_FEEDER_FILE
+  rm -rf ./QUERY_FEEDER_FILE
 fi
 
 # we're requiring SIMULATION_FILE so bash can read the ENV var
