@@ -1,4 +1,4 @@
-name := "gatling-solr"
+name := "managed-search-perf-tests"
 
 organization := "com.lucidworks"
 
