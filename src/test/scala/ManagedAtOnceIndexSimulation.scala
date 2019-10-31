@@ -43,9 +43,9 @@ class ManagedAtOnceIndexSimulation extends Simulation {
     val totalFiles = prop.getProperty("totalFiles", "1")
     val podNo = if (System.getenv("POD_NAME") != null) {
       System.getenv("POD_NAME")
-    }
+    }.split("-")(1)
     else {
-      "gatlingsolr-1"
+      "gatlingsolr-0"
     }.split("-")(1)
   }
 
@@ -99,8 +99,8 @@ class ManagedAtOnceIndexSimulation extends Simulation {
           if (fieldValues.length - 1 >= i) {
             if (Config.multiParamSep != null) {
               val multiValues = fieldValues(i).trim.split(Config.multiParamSep);
-              for (i <- 0 until multiValues.length) {
-                doc.addField(fieldNames(i), multiValues(i).trim);
+              for (j <- 0 until multiValues.length) {
+                doc.addField(fieldNames(i), multiValues(j).trim);
               }
             }
             else {

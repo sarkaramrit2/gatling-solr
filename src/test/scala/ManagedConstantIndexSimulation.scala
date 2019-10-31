@@ -43,10 +43,10 @@ class ManagedConstantIndexSimulation extends Simulation {
     val totalFiles = prop.getProperty("totalFiles", "1")
     val podNo = if (System.getenv("POD_NAME") != null) {
       System.getenv("POD_NAME")
-    }
+      }.split("-")(1)
     else {
-      "gatlingsolr-0 "
-    }.split("-")(1)
+      "gatlingsolr-1"
+      }.split("-")(1)
   }
 
   val solrIndexV2Feeder = new Feeder[util.ArrayList[SolrInputDocument]] {
