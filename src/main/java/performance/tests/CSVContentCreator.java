@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class TSVContentCreator {
+public class CSVContentCreator {
 
     private static final String SEP = ",";
     private static final String MULTI_SEP = "#";

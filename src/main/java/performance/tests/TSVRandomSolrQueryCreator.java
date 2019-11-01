@@ -5,7 +5,7 @@ import org.apache.commons.math3.distribution.ZipfDistribution;
 import java.io.*;
 import java.util.*;
 
-public class TSVSolrQueryCreator {
+public class TSVRandomSolrQueryCreator {
 
     final static Random r = new Random();
     final static Set filterQueries = new HashSet();
