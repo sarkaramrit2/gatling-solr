@@ -14,7 +14,7 @@ class IndexV1Simulation extends Simulation {
 
     val prop: Properties = new Properties
     val propFile = new FileInputStream("/opt/gatling/user-files/" +
-      "configs/index.config.properties")
+      "configs/index.1.config.properties")
     prop.load(propFile)
 
     val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
@@ -30,16 +30,52 @@ class IndexV1Simulation extends Simulation {
     val defaultCollection = prop.getProperty("defaultCollection", "wiki")
     val header = prop.getProperty("header", "title,time,description")
     val numClients = prop.getProperty("numClients", "1")
-
+    val parallelNodes = prop.getProperty("parallelNodes", "1")
+    val totalFiles = prop.getProperty("totalFiles", "1")
+    val podNo = if (System.getenv("POD_NAME") != null) {
+      System.getenv("POD_NAME")
+      }.split("-")(1)
+    else {
+      "gatlingsolr-0"
+      }.split("-")(1)
   }
 
-  val solrIndexFeeder = new Feeder[String] {
+  val solrIndexV1Feeder = new Feeder[String] {
 
-    val indexFile = new File(Config.indexFilePath)
-    var fileReader = new FileReader(indexFile)
-    var scanner = new Scanner(fileReader)
+    private var podNo = Config.podNo.toInt
+    private var indexFile: File = _
+    if (Config.totalFiles.toInt <= 1) {
+      System.out.println("indexFile: " + Config.indexFilePath)
+      indexFile = new File(Config.indexFilePath)
+    }
+    else {
+      System.out.println("indexFile: " + Config.indexFilePath + Config.podNo)
+      indexFile = new File(Config.indexFilePath + Config.podNo)
+    }
 
-    override def hasNext = scanner.hasNext()
+    private var fileReader = new FileReader(indexFile)
+    private var scanner = new Scanner(fileReader)
+
+    override def hasNext = if (!scanner.hasNext) {
+      if (Config.totalFiles.toInt <= 1) {
+        false
+      }
+      else {
+        if (podNo + Config.parallelNodes.toInt > Config.totalFiles.toInt) {
+          false
+        }
+        else {
+          podNo = podNo + Config.parallelNodes.toInt
+          indexFile = new File(Config.indexFilePath + Config.podNo)
+          fileReader = new FileReader(indexFile)
+          scanner = new Scanner(fileReader)
+          true
+        }
+      }
+    }
+    else {
+      true
+    }
 
     override def next: Map[String, String] = {
       var batchSize = Config.indexBatchSize.toInt
@@ -59,11 +95,11 @@ class IndexV1Simulation extends Simulation {
 
   object Index {
     // construct a feeder for content stored in CSV file
-    val feeder = solrIndexFeeder
+    val feeder = solrIndexV1Feeder
 
     // each user sends batches
     val search = repeat(Config.numBatchesPerUser) {
-      feed(feeder).exec(solr("indexRequest")
+      feed(feeder).exec(solr("indexV1Request")
         .index(Config.header, "${record}")) // provide appropriate header
     }
   }
