@@ -206,12 +206,12 @@ if [ ! -z "${REMOTE_INDEX_FILE_PATH}" ]; then
   # download the remote indexing file
   for (( c=0; c<${GATLING_NODES}; c++ ))
   do
-     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- mkdir -p /opt/gatling/user-files/data/
-     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- rm -rf /opt/gatling/user-files/data/external.data.txt
+     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- mkdir -p /opt/gatling/user-files/external/data/
+     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- rm -rf /opt/gatling/user-files/external/data/external.data.txt
      if [ "$PRINT_GATLING_LOG" = true ] ; then
-        docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/external.data.txt
+        docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/external/data/external.data.txt
      else
-        docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/data/external.data.txt
+        docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_INDEX_FILE_PATH}" --output /opt/gatling/user-files/external/data/external.data.txt
      fi
   done
 
