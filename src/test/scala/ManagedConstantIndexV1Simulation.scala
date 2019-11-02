@@ -6,7 +6,9 @@ import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import lucidworks.gatling.solr.Predef._
 import org.apache.solr.client.solrj.impl.HttpClientUtil
+
 import scala.concurrent.duration.DurationDouble
+import scala.util.control.Breaks.break
 
 class ManagedConstantIndexV1Simulation extends Simulation {
 
@@ -86,11 +88,16 @@ class ManagedConstantIndexV1Simulation extends Simulation {
       var batchSize = Config.indexBatchSize.toInt
       var record = ""
       while (batchSize > 0) {
-        record += scanner.nextLine()
-        batchSize = batchSize - 1
-        if (batchSize > 0) {
-          record += '\n'
+        if (scanner.hasNext()) {
+          record += scanner.nextLine()
+          batchSize = batchSize - 1
+          if (batchSize > 0) {
+            record += '\n'
+          }
         }
+        else {
+          break
+        };
       }
 
       Map(

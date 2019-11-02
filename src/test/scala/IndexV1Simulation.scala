@@ -5,6 +5,7 @@ import lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import org.apache.solr.client.solrj.impl.CloudSolrClient
+import scala.util.control.Breaks._
 
 class IndexV1Simulation extends Simulation {
 
@@ -81,11 +82,16 @@ class IndexV1Simulation extends Simulation {
       var batchSize = Config.indexBatchSize.toInt
       var record = ""
       while (batchSize > 0) {
-        record += scanner.nextLine()
-        batchSize = batchSize - 1
-        if (batchSize > 0) {
-          record += '\n'
+        if (scanner.hasNext()) {
+          record += scanner.nextLine()
+          batchSize = batchSize - 1
+          if (batchSize > 0) {
+            record += '\n'
+          }
         }
+        else {
+          break
+        };
       }
 
       Map(
