@@ -347,3 +347,16 @@ spec:
               secretKeyRef:
                 name: "oauth2"
                 key: oauth2-client-secret
+  volumeClaimTemplates:
+    - metadata:
+        namespace: namespace_filler
+        name: data
+        labels:
+          app: gatlingsolr
+      spec:
+        storageClassName: ssd
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 15Gi
