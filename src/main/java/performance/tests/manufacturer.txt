@@ -376,7 +376,7 @@ Xray Eye & Vision Clinics
 Zephyr Investments
 Zig Zag Children Clothes
 a21
-Aaron's, Inc.
+Aaron's Inc.
 Abbott Laboratories
 Abercrombie & Fitch
 ABM Industries
@@ -548,7 +548,7 @@ Black & Decker
 BlackRock
 Blockbuster Inc.
 BlueLinx Holdings
-Blyth, Inc.
+Blyth Inc.
 BMC Software
 BNSF Railway
 Bob Evans Restaurants
@@ -576,7 +576,7 @@ Burger King Holdings
 Burlington Coat Factory
 Bushmaster Firearms International
 Butler America
-CA, Inc.
+CA Inc.
 Calista Corporation
 Calpine
 Capital One
@@ -598,7 +598,7 @@ Chrysler
 CIGNA
 Citigroup
 Citrix
-Cisco Systems, Inc.
+Cisco Systems Inc.
 CKE Restaurants
 Clear Channel Communications
 CNA
@@ -637,7 +637,7 @@ DC Shoes
 Dean Foods
 Deere & Company
 Del Monte Foods
-Dell, Inc.
+Dell Inc.
 Delphi
 Delta Air Lines
 Dereon
@@ -655,7 +655,7 @@ Discover Financial Services
 Discovery Communications
 DISH Network
 The Walt Disney Company
-DivX, Inc.
+DivX Inc.
 Doculabs
 Dole Foods
 Dollar General
@@ -711,7 +711,7 @@ Fairchild Semiconductor
 FedEx
 Fender Musical Instruments Corporation
 Fidelity Investments
-FileMaker Inc., formerly Claris Corp.
+FileMaker Inc. formerly Claris Corp.
 Firestone Tire and Rubber Company
 First Hawaiian Bank
 Fiserv
@@ -722,7 +722,7 @@ Ford Motor Company
 Forum Communications
 Fox Film Corporation
 Frasca International
-Fred Meyer, Inc.
+Fred Meyer Inc.
 FreeWave Technologies
 Fresh&Easy Neighbourhood Market
 Frontier Airlines
@@ -909,7 +909,7 @@ Ocean Spray
 OCZ Technology
 Office Depot
 Office Max
-Olan Mills, Inc.
+Olan Mills Inc.
 Omnicare
 Omni Group
 ONEOK
@@ -924,8 +924,8 @@ OSI Restaurant Partners
 Overcast Media
 PACCAR
 Pacific Gas & Electric Company (PG&E)
-PalmOne, Inc.
-PalmSource, Inc.
+PalmOne Inc.
+PalmSource Inc.
 Pantone
 Papa John's Pizza
 Paramount Pictures
@@ -970,7 +970,7 @@ Red River Broadcasting
 Rent-A-Wreck
 Renys
 Regis Corporation
-Respironics, Inc.
+Respironics Inc.
 Rite Aid Corporation
 Riverdeep
 Rockford Fosgate
@@ -981,7 +981,7 @@ Rollins Inc.
 Royal Caribbean International
 Russell Investment Group
 Russell Stovers
-Ryder System, Inc.
+Ryder System Inc.
 S3 Graphics
 Safeco Corporation
 Safeway Inc.
@@ -1009,24 +1009,24 @@ Sony Pictures Entertainment
 Southern California Edison
 Southwest Airlines
 Soyo Group
-Springfield Armory, Inc.
+Springfield Armory Inc.
 Sprint Nextel Corporation
 Spanx
 Spectrum Brands
 Spherion
-Staples, Inc.
+Staples Inc.
 Starbucks
 Starz
 State Street Corporation
 Steinway & Sons
-Sterling Ledet & Associates, Inc.
+Sterling Ledet & Associates Inc.
 Sterling Commerce
 Stewart-Warner
 Storage Technology Corporation
 STX
 Subway
 Sunny Delight Beverages
-Sun Microsystems, Inc.
+Sun Microsystems Inc.
 Sunoco
 Supervalu
 Sur La Table
@@ -1108,7 +1108,7 @@ W.C. Bradley Co.
 The Weinstein Company
 Welch's
 WellPoint
-Wells Fargo Bank, N.A.
+Wells Fargo Bank N.A.
 Wendy's/Arby's Group
 Werner Enterprises
 W. R. Grace and Company
@@ -1135,12 +1135,12 @@ XPLANE
 Yahoo!
 YASH Technologies
 YRC Worldwide Inc.
-Yum! Brands, Inc.
+Yum! Brands Inc.
 Zapata
 Zappos.com
 Zaxby's
 Zenith Electronics
-ZOMM, LLC
+ZOMM LLC
 Zoo York
 Zoom Technologies
 Zune

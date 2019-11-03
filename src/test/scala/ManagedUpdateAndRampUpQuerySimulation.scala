@@ -45,6 +45,8 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
     val indexMaxNumUsers = prop.getProperty("indexMaxNumUsers", "1")
     val indexMinNumUsers = prop.getProperty("indexMinNumUsers", "1")
     val indexBatchSize = prop.getProperty("indexBatchSize", "5000")
+    val indexParallelNodes = prop.getProperty("indexParallelNodes", "1")
+    val indexTotalFiles = prop.getProperty("indexTotalFiles", "1")
 
     val updateFilePath = prop.getProperty("updateFilePath", "/opt/gatling/user-files/" +
       "data/enwiki.random.lines.csv.txt")
@@ -53,18 +55,19 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
     val updateMaxNumUsers = prop.getProperty("updateMaxNumUsers", "1")
     val updateMinNumUsers = prop.getProperty("updateMinNumUsers", "1")
     val updateBatchSize = prop.getProperty("updateBatchSize", "5000")
+    val updateParallelNodes = prop.getProperty("updateParallelNodes", "1")
+    val updateTotalFiles = prop.getProperty("updateTotalFiles", "1")
 
     val header = prop.getProperty("header", "id,title,time,description")
     val headerSep = prop.getProperty("header.sep", ",")
     val multiParamSep = prop.getProperty("multiParam.sep", null)
     val fieldValuesSep = prop.getProperty("fieldValues.sep", ",")
-    val parallelNodes = prop.getProperty("parallelNodes", "1")
-    val totalFiles = prop.getProperty("totalFiles", "1")
+
     val podNo = if (System.getenv("POD_NAME") != null) {
       System.getenv("POD_NAME")
       }.split("-")(1)
     else {
-      "gatlingsolr-0"
+      "gatlingsolr-1"
       }.split("-")(1)
 
   }
@@ -74,7 +77,7 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
     private var podNo = Config.podNo.toInt
     private var indexFile: File = _
     private var url: URL = _
-    if (Config.totalFiles.toInt <= 1) {
+    if (Config.indexTotalFiles.toInt <= 1) {
       if (Config.indexUrlPath != null) {
         System.out.println("indexUrl: " + Config.indexUrlPath)
         url = new URL(Config.indexUrlPath)
@@ -106,17 +109,17 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
     }
 
     override def hasNext = if (!scanner.hasNext) {
-      if (Config.totalFiles.toInt <= 1) {
+      if (Config.indexTotalFiles.toInt <= 1) {
         false
       }
       else {
-        if (podNo + Config.parallelNodes.toInt > Config.totalFiles.toInt) {
+        if (podNo + Config.indexParallelNodes.toInt > Config.indexTotalFiles.toInt) {
           false
         }
         else {
           scanner.close()
           fileReader.close()
-          podNo = podNo + Config.parallelNodes.toInt
+          podNo = podNo + Config.indexParallelNodes.toInt
           if (Config.indexUrlPath != null) {
             url = new URL(Config.indexUrlPath + Config.podNo)
             scanner = new Scanner(url.openStream())
@@ -161,7 +164,7 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
     private var podNo = Config.podNo.toInt
     private var updateFile: File = _
     private var url: URL = _
-    if (Config.totalFiles.toInt <= 1) {
+    if (Config.updateTotalFiles.toInt <= 1) {
       if (Config.updateUrlPath != null) {
         System.out.println("updateUrl: " + Config.updateUrlPath)
         url = new URL(Config.updateUrlPath)
@@ -193,17 +196,17 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
     }
 
     override def hasNext = if (!scanner.hasNext) {
-      if (Config.totalFiles.toInt <= 1) {
+      if (Config.updateTotalFiles.toInt <= 1) {
         false
       }
       else {
-        if (podNo + Config.parallelNodes.toInt > Config.totalFiles.toInt) {
+        if (podNo + Config.updateParallelNodes.toInt > Config.updateTotalFiles.toInt) {
           false
         }
         else {
           scanner.close()
           fileReader.close()
-          podNo = podNo + Config.parallelNodes.toInt
+          podNo = podNo + Config.updateParallelNodes.toInt
           if (Config.updateUrlPath != null) {
             url = new URL(Config.updateUrlPath + Config.podNo)
             scanner = new Scanner(url.openStream())

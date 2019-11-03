@@ -65,9 +65,9 @@ RUN mkdir -p /opt/gatling/user-files/simulations/ && \
     cp /tmp/downloads/gatling-solr/gatling-solr/src/test/resources/recorder.conf /opt/gatling/conf/ && \
     rm -rf /tmp/*
 
-# copy large files to docker if present
-RUN mkdir -p /opt/gatling/user-files/external/data
-COPY ./src/test/resources/external/data/ /opt/gatling/user-files/external/data/
+## copy large files to docker if present
+#RUN mkdir -p /opt/gatling/user-files/external/data
+#COPY ./src/test/resources/external/data/ /opt/gatling/user-files/external/data/
 
 # change context to gatling directory
 WORKDIR  /opt/gatling
