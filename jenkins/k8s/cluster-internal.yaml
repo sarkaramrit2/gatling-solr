@@ -325,13 +325,6 @@ spec:
         ports:
         - containerPort: 80
           name: gatlingsolr
-        resources:
-          limits:
-            cpu: 8
-            memory: 16G
-          requests:
-            cpu: 6
-            memory: 8G
         env:
           - name: POD_NAME
             valueFrom:
@@ -347,19 +340,3 @@ spec:
               secretKeyRef:
                 name: "oauth2"
                 key: oauth2-client-secret
-        volumeMounts:
-          - name: data
-            mountPath: /opt/gatling/user-files/data/
-  volumeClaimTemplates:
-    - metadata:
-        namespace: namespace_filler
-        name: data
-        labels:
-          app: gatlingsolr
-      spec:
-        storageClassName: ssd
-        accessModes:
-          - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: 15Gi
