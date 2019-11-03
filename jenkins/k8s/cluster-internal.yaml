@@ -340,3 +340,19 @@ spec:
               secretKeyRef:
                 name: "oauth2"
                 key: oauth2-client-secret
+        volumeMounts:
+          - name: data
+            mountPath: /opt/gatling/user-files/data/
+  volumeClaimTemplates:
+    - metadata:
+        namespace: namespace_filler
+        name: data
+        labels:
+          app: gatlingsolr
+      spec:
+        storageClassName: ssd
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 15Gi
