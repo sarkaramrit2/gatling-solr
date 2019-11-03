@@ -1,4 +1,5 @@
 import java.io.{File, FileReader}
+import java.net.URL
 import java.util.{Properties, Scanner}
 
 import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
@@ -22,6 +23,7 @@ class ManagedAtOnceIndexV1Simulation extends Simulation {
 
     val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
       "data/enwiki.random.lines.csv.txt")
+    val indexUrlPath = prop.getProperty("indexUrlPath", null)
     val numBatchesPerUser = prop.getProperty("numBatchesPerUser", "1")
     val maxNumUsers = prop.getProperty("maxNumUsers", "1")
     val minNumUsers = prop.getProperty("minNumUsers", "1")
@@ -50,17 +52,37 @@ class ManagedAtOnceIndexV1Simulation extends Simulation {
 
     private var podNo = Config.podNo.toInt
     private var indexFile: File = _
+    private var url: URL = _
     if (Config.totalFiles.toInt <= 1) {
-      System.out.println("indexFile: " + Config.indexFilePath)
-      indexFile = new File(Config.indexFilePath)
+      if (Config.indexUrlPath != null) {
+        System.out.println("indexUrl: " + Config.indexUrlPath)
+        url = new URL(Config.indexUrlPath)
+      }
+      else {
+        System.out.println("indexFile: " + Config.indexFilePath)
+        indexFile = new File(Config.indexFilePath)
+      }
     }
     else {
-      System.out.println("indexFile: " + Config.indexFilePath + Config.podNo)
-      indexFile = new File(Config.indexFilePath + Config.podNo)
+      if (Config.indexUrlPath != null) {
+        System.out.println("indexUrl: " + Config.indexUrlPath + Config.podNo)
+        url = new URL(Config.indexUrlPath + Config.podNo)
+      }
+      else {
+        System.out.println("indexFile: " + Config.indexFilePath + Config.podNo)
+        indexFile = new File(Config.indexFilePath + Config.podNo)
+      }
     }
 
-    private var fileReader = new FileReader(indexFile)
-    private var scanner = new Scanner(fileReader)
+    private var fileReader: FileReader = _
+    private var scanner: Scanner = _
+    if (Config.indexUrlPath != null) {
+      scanner = new Scanner(url.openStream())
+    }
+    else {
+      fileReader = new FileReader(indexFile)
+      scanner = new Scanner(fileReader)
+    }
 
     override def hasNext = if (!scanner.hasNext) {
       if (Config.totalFiles.toInt <= 1) {
@@ -71,10 +93,18 @@ class ManagedAtOnceIndexV1Simulation extends Simulation {
           false
         }
         else {
+          scanner.close()
+          fileReader.close()
           podNo = podNo + Config.parallelNodes.toInt
-          indexFile = new File(Config.indexFilePath + Config.podNo)
-          fileReader = new FileReader(indexFile)
-          scanner = new Scanner(fileReader)
+          if (Config.indexUrlPath != null) {
+            url = new URL(Config.indexUrlPath + Config.podNo)
+            scanner = new Scanner(url.openStream())
+          }
+          else {
+            indexFile = new File(Config.indexFilePath + Config.podNo)
+            fileReader = new FileReader(indexFile)
+            scanner = new Scanner(fileReader)
+          }
           true
         }
       }
