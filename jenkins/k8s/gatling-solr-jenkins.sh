@@ -227,6 +227,58 @@ if [ ! -z "${REMOTE_INDEX_FILE_PATH}" ]; then
   done
 fi
 
+# so we're requiring REMOTE_UPDATE_FILE_PATH so bash can read the ENV var
+if [ ! -z "${REMOTE_UPDATE_FILE_PATH}" ]; then
+  # download the remote indexing file
+  for (( c=0; c<${GATLING_NODES}; c++ ))
+  do
+     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- mkdir -p /opt/gatling/user-files/external/data/
+     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- rm -rf /opt/gatling/user-files/external/data/external.update.txt
+     if [ "$PRINT_GATLING_LOG" = true ] ; then
+        docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_UPDATE_FILE_PATH}" --output /opt/gatling/user-files/external/data/external.update.txt
+     else
+        docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_UPDATE_FILE_PATH}" --output /opt/gatling/user-files/external/data/external.update.txt
+     fi
+  done
+
+  # wait until index file copies to all gatling nodes
+  for (( c=0; c<${GATLING_NODES}; c++ ))
+    do
+    IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- ps | grep "curl" | wc -l`
+    while [ "${IF_CMD_EXEC}" != "0" ]
+    do
+      sleep 10
+      IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- ps | grep "curl" | wc -l`
+      done
+  done
+fi
+
+# so we're requiring REMOTE_QUERY_FILE_PATH so bash can read the ENV var
+if [ ! -z "${REMOTE_QUERY_FILE_PATH}" ]; then
+  # download the remote indexing file
+  for (( c=0; c<${GATLING_NODES}; c++ ))
+  do
+     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- mkdir -p /opt/gatling/user-files/external/data/
+     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- rm -rf /opt/gatling/user-files/external/data/external.query.txt
+     if [ "$PRINT_GATLING_LOG" = true ] ; then
+        docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_QUERY_FILE_PATH}" --output /opt/gatling/user-files/external/data/external.query.txt
+     else
+        docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_QUERY_FILE_PATH}" --output /opt/gatling/user-files/external/data/external.query.txt
+     fi
+  done
+
+  # wait until query file copies to all gatling nodes
+  for (( c=0; c<${GATLING_NODES}; c++ ))
+    do
+    IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- ps | grep "curl" | wc -l`
+    while [ "${IF_CMD_EXEC}" != "0" ]
+    do
+      sleep 10
+      IF_CMD_EXEC=`docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- ps | grep "curl" | wc -l`
+      done
+  done
+fi
+
 # set gatling nodes heap settings
 sed -i "s/replace-heap-settings/${GATLING_HEAP}/" ./jenkins/k8s/gatling.sh
 docker cp ./jenkins/k8s/gatling.sh ${CID}:/opt/gatling.sh
