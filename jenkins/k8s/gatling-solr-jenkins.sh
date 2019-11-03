@@ -244,7 +244,7 @@ if [ ! -z "${REMOTE_UPDATE_FILE_PATH}" ]; then
         docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_UPDATE_FILE_PATH}" --output /opt/gatling/user-files/external/data/external.update.txt
       fi
     else
-      if [ ! -z "${REMOTE_UPDATE_FILE_PATH}" ]; then
+      if [ ! -z "${REMOTE_UPDATE_FILES}" ]; then
         for ((g = 0; g < ${REMOTE_UPDATE_FILES}; g++)); do
           docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_UPDATE_FILE_PATH}" --output /opt/gatling/user-files/external/data/external.update.txt
         done
@@ -279,7 +279,7 @@ if [ ! -z "${REMOTE_QUERY_FILE_PATH}" ]; then
         docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_QUERY_FILE_PATH}" --output /opt/gatling/user-files/external/data/external.query.txt
       fi
     else
-      if [ ! -z "${REMOTE_QUERY_FILE_PATH}" ]; then
+      if [ ! -z "${REMOTE_QUERY_FILES}" ]; then
         for ((g = 0; g < ${REMOTE_QUERY_FILES}; g++)); do
           docker exec -d kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} gatlingsolr-${c} -- curl -s -N "${REMOTE_QUERY_FILE_PATH}" --output /opt/gatling/user-files/external/data/external.query.txt
         done
