@@ -325,6 +325,13 @@ spec:
         ports:
         - containerPort: 80
           name: gatlingsolr
+        resources:
+          limits:
+            cpu: 12
+            memory: 24G
+          requests:
+            cpu: 8
+            memory: 16G
         env:
           - name: POD_NAME
             valueFrom:
