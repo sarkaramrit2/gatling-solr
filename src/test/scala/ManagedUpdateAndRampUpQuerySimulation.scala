@@ -118,7 +118,9 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
         }
         else {
           scanner.close()
-          fileReader.close()
+          if (Config.indexUrlPath == null) {
+            fileReader.close()
+          }
           podNo = podNo + Config.indexParallelNodes.toInt
           if (Config.indexUrlPath != null) {
             url = new URL(Config.indexUrlPath + Config.podNo)
@@ -205,7 +207,9 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
         }
         else {
           scanner.close()
-          fileReader.close()
+          if (Config.updateUrlPath == null) {
+            fileReader.close()
+          }
           podNo = podNo + Config.updateParallelNodes.toInt
           if (Config.updateUrlPath != null) {
             url = new URL(Config.updateUrlPath + Config.podNo)
