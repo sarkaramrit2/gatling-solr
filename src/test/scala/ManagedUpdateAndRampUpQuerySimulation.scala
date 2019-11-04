@@ -310,15 +310,59 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
 
   val update = scenario("UPDATE").exec(Update.search)
 
-  setUp(
-    query.inject(
-      rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
-        (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf),
-    index.inject(
-      constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
-      .protocols(solrConf),
-    update.inject(
-      constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
-      .protocols(solrConf)
-  )
+  var indexExecute: Boolean = true
+  var updateExecute: Boolean = true
+
+  if (Config.indexParallelNodes.toInt > 1 && Config.indexTotalFiles.toInt > 1) {
+    if (Config.podNo.toInt > Config.indexTotalFiles.toInt) {
+      indexExecute = false
+    }
+  }
+
+  if (Config.updateParallelNodes.toInt > 1 && Config.updateTotalFiles.toInt > 1) {
+    if (Config.podNo.toInt > Config.updateTotalFiles.toInt) {
+      updateExecute = false
+    }
+  }
+
+  if (indexExecute && updateExecute) {
+    setUp(
+      query.inject(
+        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
+          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf),
+      index.inject(
+        constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
+        .protocols(solrConf),
+      update.inject(
+        constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
+        .protocols(solrConf)
+    )
+  }
+  else if (!indexExecute && updateExecute) {
+    setUp(
+      query.inject(
+        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
+          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf),
+      update.inject(
+        constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
+        .protocols(solrConf)
+    )
+  }
+  else if (indexExecute && !updateExecute) {
+    setUp(
+      query.inject(
+        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
+          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf),
+      index.inject(
+        constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
+        .protocols(solrConf)
+    )
+  }
+  else {
+    setUp(
+      query.inject(
+        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
+          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf)
+    )
+  }
 }
