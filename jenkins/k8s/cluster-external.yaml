@@ -57,7 +57,7 @@ spec:
                 key: oauth2-client-secret
         volumeMounts:
           - name: data
-            mountPath: /opt/gatling/user-files/data/
+            mountPath: /opt/gatling/user-files/external/
   volumeClaimTemplates:
     - metadata:
         namespace: namespace_filler
