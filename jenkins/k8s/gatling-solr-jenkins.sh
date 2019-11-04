@@ -89,7 +89,7 @@ fi
 if [ "$IMPLICIT_CLUSTER" = true ]; then
   # (re)create collection 'wiki'
   if [ "$RECREATE_COL" = true ]; then
-    docker cp ./jenkins/perf-collection-config ${CID}:/opt/collection-config
+    docker cp ./src/main/java/performance/tests/conf ${CID}:/opt/collection-config
     docker exec kubectl-support kubectl cp /opt/collection-config ${GCP_K8_CLUSTER_NAMESPACE}/solr-dummy-cluster-0:/opt/solr/collection-config
     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} solr-dummy-cluster-0 -- /opt/solr/bin/solr create -c wiki -s $((NUM_SHARDS)) -rf $((NUM_REPLICAS)) -d /opt/solr/collection-config/ || echo "collection already created"
@@ -97,7 +97,7 @@ if [ "$IMPLICIT_CLUSTER" = true ]; then
 else
   # (re)create collection 'wiki'
   if [ "$RECREATE_COL" = true ]; then
-    docker cp ./jenkins/perf-collection-config ${CID}:/opt/collection-config
+    docker cp ./src/main/java/performance/tests/conf ${CID}:/opt/collection-config
     docker exec kubectl-support kubectl cp /opt/collection-config ${GCP_K8_CLUSTER_NAMESPACE}/${EXT_SOLR_NODE_POD_NAME}:/opt/solr/collection-config
     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr delete -c wiki || echo "create collection now"
     docker exec kubectl-support kubectl exec -n ${GCP_K8_CLUSTER_NAMESPACE} ${EXT_SOLR_NODE_POD_NAME} -- /opt/solr/bin/solr create -c wiki -s $((NUM_SHARDS)) -rf $((NUM_REPLICAS)) -d /opt/solr/collection-config/ || echo "collection already created"
