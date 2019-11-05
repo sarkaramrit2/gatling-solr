@@ -27,9 +27,11 @@ class ManagedSolrQueryRequestActionBuilder[K](solrAttributes: SolrQueryAttribute
     var solrClient = null: CloudSolrClient;
     // create http request interceptor and start it
 
-    solrClient = new CloudSolrClient.Builder(Collections.singletonList(solrComponents.solrProtocol.solrurl)).build
-    solrClient.setDefaultCollection(solrComponents.solrProtocol.collection)
-    solrClients.add(solrClient)
+    for (i <- 0 until solrComponents.solrProtocol.numClients) {
+      solrClient = new CloudSolrClient.Builder(Collections.singletonList(solrComponents.solrProtocol.solrurl)).build
+      solrClient.setDefaultCollection(solrComponents.solrProtocol.collection)
+      solrClients.add(solrClient)
+    }
 
     coreComponents.actorSystem.registerOnTermination(
       for (i <- 0 until solrComponents.solrProtocol.numClients) {
