@@ -95,7 +95,9 @@ class ManagedConstantIndexV1Simulation extends Simulation {
         }
         else {
           scanner.close()
-          fileReader.close()
+          if (Config.indexUrlPath == null) {
+            fileReader.close()
+          }
           podNo = podNo + Config.parallelNodes.toInt
           if (Config.indexUrlPath != null) {
             url = new URL(Config.indexUrlPath + Config.podNo)
