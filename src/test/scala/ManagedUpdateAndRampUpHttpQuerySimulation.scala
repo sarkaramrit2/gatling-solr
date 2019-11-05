@@ -276,9 +276,14 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
     // construct a feeder for our query params stored in the csv
     val feeder = tsv(Config.queryFeederSource).circular
 
+    val authToken = Option(System.getenv("AUTH_TOKEN"))
+    val authTokenVal: String = if (authToken.isDefined) authToken.get else System.getProperty("AUTH_TOKEN")
+
     // each user sends loops queries
-    val search = feed(feeder).exec(http("QueryRequest").get(Config.solrUrl + "/"
-        + Config.defaultCollection + "/select?" + Config.basequery))
+    val search = feed(feeder).exec(
+      http("QueryRequest").
+        get(Config.solrUrl + "/" + Config.defaultCollection + "/select?" + Config.basequery).
+        header("Authorization", "Bearer " + authTokenVal))
 
   }
 

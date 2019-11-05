@@ -10,7 +10,7 @@ import org.apache.solr.client.solrj.impl.{CloudSolrClient, HttpClientUtil}
 import scala.concurrent.duration._
 // required information to access the managed search service// required information to access the managed search service
 
-class ManagedConstantHttpQuerySimulation extends Simulation {
+class ManagedConstantQueryHttpSimulation extends Simulation {
 
   object Config {
     import java.io.FileInputStream
@@ -41,13 +41,13 @@ class ManagedConstantHttpQuerySimulation extends Simulation {
     val feeder = tsv(Config.queryFeederSource).circular
 
     val authToken = Option(System.getenv("AUTH_TOKEN"))
-    val authTokenId: String = if (authToken.isDefined) authToken.get else System.getProperty("AUTH_TOKEN")
+    val authTokenVal: String = if (authToken.isDefined) authToken.get else System.getProperty("AUTH_TOKEN")
 
     // each user sends loops queries
     val search = feed(feeder).exec(
       http("QueryRequest").get(Config.solrUrl + "/"
       + Config.defaultCollection + "/query?" + Config.basequery)
-    .header("Authorization","Bearer " + authTokenId))
+    .header("Authorization","Bearer " + authTokenVal))
 
   }
 
