@@ -53,7 +53,6 @@ class SolrQueryV3RequestAction[K, V](val solrAttributes: SolrQueryAttributes[V],
   }
 
   private def sendRequest(requestName: String,
-                          solrClient: CloudSolrClient,
                           solrAttributes: SolrQueryAttributes[V],
                           throttled: Boolean,
                           session: Session): Validation[Unit] = {
