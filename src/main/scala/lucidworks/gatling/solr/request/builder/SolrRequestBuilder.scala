@@ -28,6 +28,9 @@ case class SolrRequestBuilder(requestName: Expression[String]) {
   def queryV2[K](payload: Expression[String]): SolrQueryV2RequestActionBuilder[K] =
     new SolrQueryV2RequestActionBuilder(SolrQueryAttributes(requestName, payload))
 
+  def queryV3[K](payload: Expression[String]): SolrQueryV3RequestActionBuilder[K] =
+    new SolrQueryV3RequestActionBuilder(SolrQueryAttributes(requestName, payload))
+
   def index[K, V](header: String, payload: Expression[String]): SolrIndexRequestActionBuilder[K, V] =
     new SolrIndexRequestActionBuilder(SolrIndexAttributes(requestName, header, payload))
 
@@ -40,8 +43,11 @@ case class SolrRequestBuilder(requestName: Expression[String]) {
   def managedQuery[K](payload: Expression[String]): ManagedSolrQueryRequestActionBuilder[K] =
     new ManagedSolrQueryRequestActionBuilder(SolrQueryAttributes(requestName, payload))
 
-  def managedQueryV2[K](payload: Expression[String]): ManagedSolrV2QueryRequestActionBuilder[K] =
-    new ManagedSolrV2QueryRequestActionBuilder(SolrQueryAttributes(requestName, payload))
+  def managedQueryV2[K](payload: Expression[String]): ManagedSolrQueryV2RequestActionBuilder[K] =
+    new ManagedSolrQueryV2RequestActionBuilder(SolrQueryAttributes(requestName, payload))
+
+  def managedQueryV3[K](payload: Expression[String]): ManagedSolrQueryV3RequestActionBuilder[K] =
+    new ManagedSolrQueryV3RequestActionBuilder(SolrQueryAttributes(requestName, payload))
 
   def managedIndex[K, V](header: String, payload: util.ArrayList[SolrInputDocument]): ManagedSolrIndexRequestActionBuilder[K, V] =
     new ManagedSolrIndexRequestActionBuilder(SolrIndexV2Attributes(requestName, header, payload))

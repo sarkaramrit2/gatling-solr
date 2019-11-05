@@ -1,24 +1,20 @@
 package lucidworks.gatling.solr.action
 
-import java.util
-import java.util.Collections
-
 import io.gatling.core.action.Action
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.structure.ScenarioContext
 import lucidworks.gatling.solr.protocol.{SolrComponents, SolrProtocol}
 import lucidworks.gatling.solr.request.builder.SolrQueryAttributes
-import org.apache.solr.client.solrj.impl.CloudSolrClient
 
 
-class ManagedSolrQueryV2RequestActionBuilder[K](solrAttributes: SolrQueryAttributes[K]) extends ActionBuilder {
+class SolrQueryV3RequestActionBuilder[K](solrAttributes: SolrQueryAttributes[K]) extends ActionBuilder {
 
   override def build(ctx: ScenarioContext, next: Action): Action = {
     import ctx.{coreComponents, protocolComponentsRegistry, throttled}
 
     val solrComponents: SolrComponents = protocolComponentsRegistry.components(SolrProtocol.SolrProtocolKey)
 
-    new ManagedSolrQueryV2RequestAction(
+    new SolrQueryV3RequestAction(
       solrAttributes,
       coreComponents,
       solrComponents.solrProtocol,
