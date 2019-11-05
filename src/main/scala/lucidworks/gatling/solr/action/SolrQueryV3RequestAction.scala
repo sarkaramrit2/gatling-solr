@@ -37,7 +37,6 @@ class SolrQueryV3RequestAction[K, V](val solrAttributes: SolrQueryAttributes[V],
       val outcome =
         sendRequest(
           requestName,
-          solrClient, // round robin for solrclients
           solrAttributes,
           throttled,
           session)
