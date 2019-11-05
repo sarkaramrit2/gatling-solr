@@ -78,7 +78,15 @@ class SolrIndexRequestAction[K, V](val solrClients: util.ArrayList[CloudSolrClie
 
         for (i <- 0 until fieldNames.length) {
           if (fieldValues.length - 1 >= i) {
-            doc.addField(fieldNames(i), fieldValues(i).trim);
+            if (prop.getProperty(Constants.MULTIPARAM_SEP, "#") != null) {
+              val multiValues = fieldValues(i).trim.split(prop.getProperty(Constants.MULTIPARAM_SEP, "#"));
+              for (j <- 0 until multiValues.length) {
+                doc.addField(fieldNames(i), multiValues(j).trim);
+              }
+            }
+            else {
+              doc.addField(fieldNames(i), fieldValues(i))
+            }
           }
         }
         docs.add(doc)

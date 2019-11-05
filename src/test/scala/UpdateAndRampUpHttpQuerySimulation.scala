@@ -1,6 +1,6 @@
 import java.io.{File, FileReader}
 import java.net.URL
-import java.util.{Properties, Scanner}
+import java.util.{Properties, Random, Scanner}
 
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
@@ -35,6 +35,8 @@ class UpdateAndRampUpHttpQuerySimulation extends Simulation {
     val defaultCollection = prop.getProperty("defaultCollection", "test")
     val numClients = prop.getProperty("numClients", "1")
     val oauth2CustomerId = prop.getProperty("CUSTOMER_ID", "lucidworks")
+    val clusterName = prop.getProperty("clusterName", "example")
+    val totalSolrNodes = prop.getProperty("totalSolrNodes", "6")
 
     val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
       "data/enwiki.random.lines.csv.txt")
@@ -68,6 +70,7 @@ class UpdateAndRampUpHttpQuerySimulation extends Simulation {
       "gatlingsolr-1"
       }.split("-")(1)
 
+    val r = scala.util.Random
   }
 
   val solrIndexV1Feeder = new Feeder[String] {
@@ -273,9 +276,19 @@ class UpdateAndRampUpHttpQuerySimulation extends Simulation {
     // construct a feeder for our query params stored in the csv
     val feeder = tsv(Config.queryFeederSource).circular
 
+    val nodeNo = Config.podNo.toInt % Config.totalSolrNodes.toInt
+
+    val firstUrlPath = "http://solr-" + Config.clusterName + "-"
+    val secondUrlPath = ".solr-hs-" + Config.clusterName + "." + Config.oauth2CustomerId + "-" + Config.clusterName +
+      ".svc.cluster.local:8983/solr"
     // each user sends loops queries
-    val search = feed(feeder).exec(http("QueryRequest").get(Config.solrUrl + "/"
-      + Config.defaultCollection + "/query?" + Config.basequery))
+    println(firstUrlPath + nodeNo + secondUrlPath)
+
+    val search = feed(feeder).exec(http("QueryRequest").get(
+
+      firstUrlPath + nodeNo + secondUrlPath +
+
+      "/" + Config.defaultCollection + "/select?" + Config.basequery))
 
   }
 

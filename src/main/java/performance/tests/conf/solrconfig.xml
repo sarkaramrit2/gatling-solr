@@ -439,9 +439,9 @@
                        to occupy
       -->
     <queryResultCache class="solr.LRUCache"
-                      size="512"
-                      initialSize="512"
-                      maxRamMB="1024"
+                      size="2048"
+                      initialSize="2048"
+                      maxRamMB="2048"
                       autowarmCount="1024"/>
 
     <!-- Document Cache
