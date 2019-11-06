@@ -425,8 +425,6 @@
                       and initialSize parameters are ignored.
       -->
     <filterCache class="solr.FastLRUCache"
-                 size="512"
-                 initialSize="512"
                  maxRamMB="1024"
                  autowarmCount="1024"/>
 
@@ -439,8 +437,6 @@
                        to occupy
       -->
     <queryResultCache class="solr.LRUCache"
-                      size="2048"
-                      initialSize="2048"
                       maxRamMB="2048"
                       autowarmCount="1024"/>
 
