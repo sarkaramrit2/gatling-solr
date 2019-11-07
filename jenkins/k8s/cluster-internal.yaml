@@ -347,6 +347,11 @@ spec:
               secretKeyRef:
                 name: "oauth2"
                 key: oauth2-client-secret
+          - name: AUTH_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: "oauth2"
+                key: oauth2-auth-token
         volumeMounts:
           - name: data
             mountPath: /opt/gatling/user-files/external/
