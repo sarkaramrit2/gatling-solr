@@ -288,7 +288,7 @@ class UpdateAndRampUpHttpQuerySimulation extends Simulation {
 
       firstUrlPath + nodeNo + secondUrlPath +
 
-      "/" + Config.defaultCollection + "/select?" + Config.basequery))
+      "/" + Config.defaultCollection + "/managedselect?" + Config.basequery))
 
   }
 
