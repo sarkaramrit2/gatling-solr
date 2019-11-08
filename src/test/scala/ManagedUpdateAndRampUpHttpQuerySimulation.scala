@@ -282,7 +282,7 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
     // each user sends loops queries
     val search = feed(feeder).exec(
       http("QueryRequest").
-        get(Config.solrUrl + "/" + Config.defaultCollection + "/select?" + Config.basequery).
+        get(Config.solrUrl + "/" + Config.defaultCollection + "/managedselect?" + Config.basequery).
         header("Authorization", "Bearer " + authTokenVal))
 
   }
