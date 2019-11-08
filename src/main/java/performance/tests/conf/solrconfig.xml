@@ -715,11 +715,6 @@
         -->
     </lst>
 
-    <requestHandler name="/managedselect" class="solr.SearchHandler">
-        <lst name="defaults">
-            <str name="echoParams">explicit</str>
-            <int name="rows">20</int>
-        </lst>
     <!-- In addition to defaults, "appends" params can be specified
          to identify values which should be appended to the list of
          multi-val params from the query (or the existing "defaults").
@@ -772,6 +767,13 @@
          <str>nameOfCustomComponent2</str>
        </arr>
       -->
+  </requestHandler>
+
+  <requestHandler name="/managedselect" class="solr.SearchHandler">
+  <lst name="defaults">
+    <str name="echoParams">explicit</str>
+    <int name="rows">20</int>
+  </lst>
   </requestHandler>
 
   <!-- A request handler that returns indented JSON by default -->
