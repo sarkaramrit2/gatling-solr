@@ -278,11 +278,12 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
 
     val authToken = Option(System.getenv("AUTH_TOKEN"))
     val authTokenVal: String = if (authToken.isDefined) authToken.get else System.getProperty("AUTH_TOKEN")
+    println("token: " + authTokenVal)
 
     // each user sends loops queries
     val search = feed(feeder).exec(
       http("QueryRequest").
-        get(Config.solrUrl + "/" + Config.defaultCollection + "/managedselect?" + Config.basequery).
+        get(Config.solrUrl + "/" + Config.defaultCollection + "/select?" + Config.basequery).
         header("Authorization", "Bearer " + authTokenVal))
 
   }

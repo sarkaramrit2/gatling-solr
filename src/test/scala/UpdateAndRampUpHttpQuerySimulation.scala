@@ -28,7 +28,7 @@ class UpdateAndRampUpHttpQuerySimulation extends Simulation {
     val queryMaxNumUsers = prop.getProperty("queryMaxNumUsers", "3")
     val queryMinNumUsers = prop.getProperty("queryMinNumUsers", "1")
     val totalTimeInMinutes = prop.getProperty("totalTimeInMinutes", "1")
-    val basequery = prop.getProperty("basequery", "${params}&defType=edismax&qf=title description")
+    val basequery = prop.getProperty("basequery", "${params}&defType=edismax")
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
     val solrUrl = prop.getProperty("solrUrl", "http://localhost:8983/solr/")
     val apiKey = prop.getProperty("apiKey", "--empty-here--")
@@ -288,7 +288,7 @@ class UpdateAndRampUpHttpQuerySimulation extends Simulation {
 
       firstUrlPath + nodeNo + secondUrlPath +
 
-      "/" + Config.defaultCollection + "/managedselect?" + Config.basequery))
+      "/" + Config.defaultCollection + "/select?" + Config.basequery))
 
   }
 
