@@ -340,7 +340,7 @@ while read -r CLASS; do
   # generate the reports
   for ((c = 0; c < ${GATLING_NODES}; c++)); do
     docker exec kubectl-support mkdir -p /opt/results/reports-${c}-${CLASS}
-    docker exec kubectl-support kubectl cp ${GCP_K8_CLUSTER_NAMESPACE}/gatlingsolr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS}/results/ /opt/results/reports-${c}-${CLASS}/
+    docker exec kubectl-support kubectl cp ${GCP_K8_CLUSTER_NAMESPACE}/gatlingsolr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS}/results/ /opt/results/reports-${c}-${CLASS}/ || echo "!! Logs not present !!"
   done
 
   docker exec kubectl-support gatling.sh -ro /opt/results/
