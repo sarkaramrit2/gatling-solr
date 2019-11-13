@@ -318,14 +318,14 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
   var indexExecute: Boolean = true
   var updateExecute: Boolean = true
 
-  if (Config.indexParallelNodes.toInt > 1 && Config.indexTotalFiles.toInt > 1) {
-    if (Config.podNo.toInt > Config.indexTotalFiles.toInt) {
+  if (Config.indexParallelNodes.toInt > 1) {
+    if (Config.podNo.toInt >= Config.indexParallelNodes.toInt) {
       indexExecute = false
     }
   }
 
-  if (Config.updateParallelNodes.toInt > 1 && Config.updateTotalFiles.toInt > 1) {
-    if (Config.podNo.toInt > Config.updateTotalFiles.toInt) {
+  if (Config.updateParallelNodes.toInt > 1) {
+    if (Config.podNo.toInt >= Config.updateParallelNodes.toInt) {
       updateExecute = false
     }
   }
