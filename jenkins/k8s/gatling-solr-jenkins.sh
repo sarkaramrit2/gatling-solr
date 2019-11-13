@@ -337,17 +337,29 @@ while read -r CLASS; do
     done
   done
 
-  # generate the reports
-  for ((c = 0; c < ${GATLING_NODES}; c++)); do
-    docker exec kubectl-support mkdir -p /opt/results/reports-${c}-${CLASS}
-    docker exec kubectl-support kubectl cp ${GCP_K8_CLUSTER_NAMESPACE}/gatlingsolr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS}/results/ /opt/results/reports-${c}-${CLASS}/ || echo "!! Logs not present !!"
+  # generate the index reports
+  for ((c = 0; c < ${INDEX_GATLING_NODES}; c++)); do
+    docker exec kubectl-support mkdir -p /opt/index-results/reports-${c}-${CLASS}
+    docker exec kubectl-support kubectl cp ${GCP_K8_CLUSTER_NAMESPACE}/gatlingsolr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS}/results/ /opt/index-results/reports-${c}-${CLASS}/ || echo "!! Logs not present !!"
   done
 
-  docker exec kubectl-support gatling.sh -ro /opt/results/
+  # generate the query reports
+  for ((c = ${INDEX_GATLING_NODES}; c < ${GATLING_NODES}; c++)); do
+    docker exec kubectl-support mkdir -p /opt/query-results/reports-${c}-${CLASS}
+    docker exec kubectl-support kubectl cp ${GCP_K8_CLUSTER_NAMESPACE}/gatlingsolr-${c}:/tmp/gatling-perf-tests-${c}-${CLASS}/results/ /opt/query-results/reports-${c}-${CLASS}/ || echo "!! Logs not present !!"
+  done
+
+  echo "!! Index Reports !!"
+  docker exec kubectl-support gatling.sh -ro /opt/index-results/
+  echo "!! Query Reports !!"
+  docker exec kubectl-support gatling.sh -ro /opt/query-results/
+
   # copy the perf tests to the workspace
-  mkdir -p workspace/reports-${BUILD_NUMBER}/${CLASS}
-  docker cp ${CID}:/opt/results ./workspace/reports-${BUILD_NUMBER}/${CLASS}
-  docker exec kubectl-support rm -rf /opt/results/
+  mkdir -p workspace/index-reports-${BUILD_NUMBER}/${CLASS}
+  docker cp ${CID}:/opt/index-results ./workspace/index-reports-${BUILD_NUMBER}/${CLASS}
+  mkdir -p workspace/query-reports-${BUILD_NUMBER}/${CLASS}
+  docker cp ${CID}:/opt/query-results ./workspace/query-reports-${BUILD_NUMBER}/${CLASS}
+  docker exec kubectl-support rm -rf /opt/index-results/ /opt/query-results/
 
 done <<<"${SIMULATION_CLASS}"
 
