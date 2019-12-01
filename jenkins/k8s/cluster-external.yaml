@@ -42,11 +42,11 @@ spec:
           name: gatlingsolr
         resources:
           limits:
-            cpu: 6
-            memory: 18G
+            cpu: 2
+            memory: 2G
           requests:
-            cpu: 4
-            memory: 15G
+            cpu: 1
+            memory: 1G
         env:
           - name: POD_NAME
             valueFrom:
