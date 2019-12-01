@@ -6,7 +6,12 @@ if [ -z "${GCP_KEY_FILE}" ]; then echo "GCP_KEY_FILE must be non-blank" && exit 
 set -e
 set -x
 
-docker run -it -d --rm --name kubectl-support sarkaramrit2/kubectl-support:latest
+if [ "$GCP" = true ] ; then
+  docker run -it -d --rm --name kubectl-support sarkaramrit2/kubectl-support:latest
+else
+  docker run -it -d --rm -e AWS_ACCESS_KEY_ID=$(cut -d ',' -f -1 ${GCP_KEY_FILE}) -e AWS_SECRET_ACCESS_KEY=$(cut -d ',' -f -2 ${GCP_KEY_FILE}) --name kubectl-support sarkaramrit2/kubectl-support:latest
+fi
+
 # set container id in which the docker is running
 CID=`docker container ls -aq -f "name=kubectl-support"`
 
@@ -23,12 +28,16 @@ fi
 # delete the GCP file
 rm -rf ./GCP_KEY_FILE
 
-docker exec kubectl-support gcloud auth activate-service-account --key-file /opt/${GCP_KEY_FILE}
-docker exec kubectl-support gcloud config get-value core/account
-docker exec kubectl-support gcloud config set project ${GCP_K8_PROJECT}
-docker exec kubectl-support gcloud config list
-if [ "$SET_ZONE_UNSET_REGION" = true ] ; then
-    docker exec kubectl-support gcloud container clusters get-credentials ${GCP_K8_CLUSTER_NAME} --zone "$ZONE_REGION"
-else
+if [ "$GCP" = true ] ; then
+  docker exec kubectl-support gcloud auth activate-service-account --key-file /opt/${GCP_KEY_FILE}
+  docker exec kubectl-support gcloud config get-value core/account
+  docker exec kubectl-support gcloud config set project ${GCP_K8_PROJECT}
+  docker exec kubectl-support gcloud config list
+  if [ "$SET_ZONE_UNSET_REGION" = true ] ; then
+      docker exec kubectl-support gcloud container clusters get-credentials ${GCP_K8_CLUSTER_NAME} --zone "$ZONE_REGION"
+  else
     docker exec kubectl-support gcloud container clusters get-credentials ${GCP_K8_CLUSTER_NAME} --region "$ZONE_REGION"
+  fi
+else
+ docker exec kubectl-support eksctl utils write-kubeconfig ${GCP_K8_CLUSTER_NAME}
 fi

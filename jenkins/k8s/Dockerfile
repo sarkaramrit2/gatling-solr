@@ -7,13 +7,19 @@ WORKDIR /opt
 
 ENV GATLING_VERSION=3.0.0
 
-# Install gcloud, kubectl
+# Install gcloud, kubectl, aws ekctl
 RUN \
     export CLOUD_SDK_REPO="cloud-sdk" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
     apt-get update -y && apt-get install google-cloud-sdk kubectl -y && \
-    apt-get install wget -y
+    apt-get install wget -y && \
+    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
+    unzip awscli-bundle.zip && \
+    ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws && \
+    rm -rf awscli-bundle* && \
+    curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && \
+    mv /tmp/eksctl /usr/local/bin
 
 # install gatling
 RUN apt-get install wget bash && \
