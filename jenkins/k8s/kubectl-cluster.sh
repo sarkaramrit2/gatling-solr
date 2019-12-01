@@ -9,7 +9,7 @@ set -x
 if [ "$GCP" = true ] ; then
   docker run -it -d --rm --name kubectl-support sarkaramrit2/kubectl-support:latest
 else
-  docker run -it -d --rm  -e AWS_SECRET_ACCESS_KEY=`tail -1 ./GCP_KEY_FILE` -e AWS_ACCESS_KEY_ID=`head -1 ./GCP_KEY_FILE` --name kubectl-support sarkaramrit2/kubectl-support:latest
+  docker run -it -d --rm  -e AWS_SECRET_ACCESS_KEY=$(tail -1 ./GCP_KEY_FILE) -e AWS_ACCESS_KEY_ID=$(head -1 ./GCP_KEY_FILE) --name kubectl-support sarkaramrit2/kubectl-support:latest
   rm -rf ./GCP_KEY_FILE
 fi
 
