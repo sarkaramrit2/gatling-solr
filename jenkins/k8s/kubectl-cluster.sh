@@ -9,24 +9,23 @@ set -x
 if [ "$GCP" = true ] ; then
   docker run -it -d --rm --name kubectl-support sarkaramrit2/kubectl-support:latest
 else
-  export AWS_ACCESS_KEY_ID=`cut -d ',' -f 1 ./GCP_KEY_FILE` &
-  export AWS_SECRET_ACCESS_KEY=`cut -d ',' -f 2 ./GCP_KEY_FILE` &
-  sleep 2
-  docker run -it -d --rm -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} --name kubectl-support sarkaramrit2/kubectl-support:latest
+  docker run -it -d --rm -e AWS_ACCESS_KEY_ID=`cut -d ',' -f 1 ./GCP_KEY_FILE` -e AWS_SECRET_ACCESS_KEY=`cut -d ',' -f 2 ./GCP_KEY_FILE` --name kubectl-support sarkaramrit2/kubectl-support:latest
   rm -rf ./GCP_KEY_FILE
 fi
 
 # set container id in which the docker is running
 CID=`docker container ls -aq -f "name=kubectl-support"`
 
-if [ ! -z "${GCP_KEY_FILE}" ]; then
-  if  [ ! -f ./GCP_KEY_FILE ]; then
-    echo "Found ENV{GCP_KEY_FILE}=${GCP_KEY_FILE} -- but ./GCP_KEY_FILE not found, jenkins bug?" && exit -1;
+if [ "$GCP" = true ] ; then
+  if [ ! -z "${GCP_KEY_FILE}" ]; then
+    if  [ ! -f ./GCP_KEY_FILE ]; then
+      echo "Found ENV{GCP_KEY_FILE}=${GCP_KEY_FILE} -- but ./GCP_KEY_FILE not found, jenkins bug?" && exit -1;
+    fi
+    # copy the configs from local to docker
+    docker cp ./GCP_KEY_FILE ${CID}:/opt/${GCP_KEY_FILE}
+  else
+    rm -rf ./GCP_KEY_FILE
   fi
-  # copy the configs from local to docker
-  docker cp ./GCP_KEY_FILE ${CID}:/opt/${GCP_KEY_FILE}
-else
-  rm -rf ./GCP_KEY_FILE
 fi
 
 # delete the GCP file
