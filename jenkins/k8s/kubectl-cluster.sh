@@ -9,9 +9,11 @@ set -x
 if [ "$GCP" = true ] ; then
   docker run -it -d --rm --name kubectl-support sarkaramrit2/kubectl-support:latest
 else
-  export AWS_ACCESS_KEY_ID=`cut -d ',' -f -1 ./GCP_KEY_FILE`
-  export AWS_SECRET_ACCESS_KEY=`cut -d ',' -f -2 ./GCP_KEY_FILE`
-  docker run -it -d --rm -e AWS_ACCESS_KEY_ID='${AWS_ACCESS_KEY_ID}' -e AWS_SECRET_ACCESS_KEY='${AWS_SECRET_ACCESS_KEY}' --name kubectl-support sarkaramrit2/kubectl-support:latest
+  export AWS_ACCESS_KEY_ID=`cut -d ',' -f 1 ./GCP_KEY_FILE` &
+  export AWS_SECRET_ACCESS_KEY=`cut -d ',' -f 2 ./GCP_KEY_FILE` &
+  sleep 2
+  docker run -it -d --rm -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} --name kubectl-support sarkaramrit2/kubectl-support:latest
+  rm -rf ./GCP_KEY_FILE
 fi
 
 # set container id in which the docker is running
@@ -28,7 +30,7 @@ else
 fi
 
 # delete the GCP file
-rm -rf ./GCP_KEY_FILE
+rm -rf ./GCP_KEY_FILE || echo "already deleted"
 
 if [ "$GCP" = true ] ; then
   docker exec kubectl-support gcloud auth activate-service-account --key-file /opt/${GCP_KEY_FILE}
