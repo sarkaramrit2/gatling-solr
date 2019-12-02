@@ -34,6 +34,13 @@ spec:
         app: gatlingsolr # has to match .spec.selector.matchLabels
     spec:
       terminationGracePeriodSeconds: 10
+      nodeSelector:
+        managed-search/instance-type: m5.2xlarge
+        managed-search/role: solr
+      tolerations:
+        - effect: NoSchedule
+          key: managed-search/taint
+          value: solr
       containers:
       - name: gatlingsolr
         image: sarkaramrit2/gatling-solr:latest
@@ -42,11 +49,11 @@ spec:
           name: gatlingsolr
         resources:
           limits:
-            cpu: 2
-            memory: 2G
+            cpu: 6
+            memory: 18G
           requests:
-            cpu: 1
-            memory: 1G
+            cpu: 4
+            memory: 15G
         env:
           - name: POD_NAME
             valueFrom:
