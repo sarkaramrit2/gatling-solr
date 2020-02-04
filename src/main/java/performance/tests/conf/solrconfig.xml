@@ -438,6 +438,7 @@
       -->
     <queryResultCache class="solr.LRUCache"
                       maxRamMB="4096"
+                      size="999999"
                       autowarmCount="16384"/>
 
     <!-- Document Cache
