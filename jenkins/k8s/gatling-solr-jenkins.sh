@@ -27,13 +27,13 @@ if [ "$IMPLICIT_CLUSTER" = true ]; then
   if [ "$GCP" = true ] ; then
     cp ./jenkins/k8s/cluster-gcp-internal.yaml ./jenkins/k8s/cluster.yaml
   else
-   cp ./jenkins/k8s/cluster-aws-internal.yaml ./jenkins/k8s/cluster.yaml
+    cp ./jenkins/k8s/cluster-aws-internal.yaml ./jenkins/k8s/cluster.yaml
   fi
 else
   if [ "$GCP" = true ] ; then
     cp ./jenkins/k8s/cluster-gcp-external.yaml ./jenkins/k8s/cluster.yaml
   else
-   cp ./jenkins/k8s/cluster-aws-external.yaml ./jenkins/k8s/cluster.yaml
+    cp ./jenkins/k8s/cluster-aws-external.yaml ./jenkins/k8s/cluster.yaml
   fi
 fi
 
