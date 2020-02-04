@@ -34,6 +34,9 @@ spec:
         app: gatlingsolr # has to match .spec.selector.matchLabels
     spec:
       terminationGracePeriodSeconds: 10
+      nodeSelector:
+        managed-search/instance-type: m5.2xlarge
+        managed-search/role: solr
       tolerations:
         - effect: NoSchedule
           key: managed-search/taint

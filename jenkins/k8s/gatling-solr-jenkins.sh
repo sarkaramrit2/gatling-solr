@@ -24,9 +24,17 @@ if [ "$IMPLICIT_CLUSTER" = true ]; then
   # TODO: hardcoded need to provide the check better, possible parameter passing
   ESTIMATED_NODES_1=$((ESTIMATED_NODES_1 + 4))
   ESTIMATED_NODES_2=$((ESTIMATED_NODES_2 + 4))
-  cp ./jenkins/k8s/cluster-internal.yaml ./jenkins/k8s/cluster.yaml
+  if [ "$GCP" = true ] ; then
+    cp ./jenkins/k8s/cluster-gcp-internal.yaml ./jenkins/k8s/cluster.yaml
+  else
+   cp ./jenkins/k8s/cluster-aws-internal.yaml ./jenkins/k8s/cluster.yaml
+  fi
 else
-  cp ./jenkins/k8s/cluster-external.yaml ./jenkins/k8s/cluster.yaml
+  if [ "$GCP" = true ] ; then
+    cp ./jenkins/k8s/cluster-gcp-external.yaml ./jenkins/k8s/cluster.yaml
+  else
+   cp ./jenkins/k8s/cluster-aws-external.yaml ./jenkins/k8s/cluster.yaml
+  fi
 fi
 
 CID=$(docker container ls -aq -f "name=kubectl-support")
