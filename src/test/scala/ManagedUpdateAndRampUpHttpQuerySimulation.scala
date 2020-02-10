@@ -301,9 +301,9 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
   // register http request interceptor with solrj
   HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
 
-  val client = new CloudSolrClient.Builder(Collections.singletonList(Config.solrUrl)).build()
-  client.setDefaultCollection(Config.defaultCollection)
-  client.commit(false, true)
+//  val client = new CloudSolrClient.Builder(Collections.singletonList(Config.solrUrl)).build()
+//  client.setDefaultCollection(Config.defaultCollection)
+//  client.commit(false, true)
 
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
   val solrConf = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection).numClients(Config.numClients.toInt).properties(Config.prop)

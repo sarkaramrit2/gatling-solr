@@ -28,7 +28,7 @@ class UpdateAndRampUpHttpQuerySimulation extends Simulation {
     val queryMaxNumUsers = prop.getProperty("queryMaxNumUsers", "3")
     val queryMinNumUsers = prop.getProperty("queryMinNumUsers", "1")
     val totalTimeInMinutes = prop.getProperty("totalTimeInMinutes", "1")
-    val basequery = prop.getProperty("basequery", "${params}&defType=edismax")
+    val basequery = prop.getProperty("basequery", "${params}&defType=edismax&qf=title description")
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
     val solrUrl = prop.getProperty("solrUrl", "http://localhost:8983/solr/")
     val apiKey = prop.getProperty("apiKey", "--empty-here--")
@@ -305,56 +305,47 @@ class UpdateAndRampUpHttpQuerySimulation extends Simulation {
   var indexExecute: Boolean = true
   var updateExecute: Boolean = true
 
-  if (Config.indexParallelNodes.toInt > 1 && Config.indexTotalFiles.toInt > 1) {
-    if (Config.podNo.toInt > Config.indexTotalFiles.toInt) {
+  if (Config.indexParallelNodes.toInt > 1) {
+    if (Config.podNo.toInt >= Config.indexParallelNodes.toInt) {
       indexExecute = false
     }
   }
 
-  if (Config.updateParallelNodes.toInt > 1 && Config.updateTotalFiles.toInt > 1) {
-    if (Config.podNo.toInt > Config.updateTotalFiles.toInt) {
+  if (Config.updateParallelNodes.toInt > 1) {
+    if (Config.podNo.toInt >= Config.updateParallelNodes.toInt) {
       updateExecute = false
     }
   }
 
   if (indexExecute && updateExecute) {
     setUp(
-      query.inject(
-        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
-          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf),
       index.inject(
         constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
         .protocols(solrConf),
       update.inject(
         constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
         .protocols(solrConf)
-    )
+    ).maxDuration((Config.totalTimeInMinutes.toInt + 5) minutes)
   }
   else if (!indexExecute && updateExecute) {
     setUp(
-      query.inject(
-        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
-          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf),
       update.inject(
         constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
         .protocols(solrConf)
-    )
+    ).maxDuration((Config.totalTimeInMinutes.toInt + 5) minutes)
   }
   else if (indexExecute && !updateExecute) {
     setUp(
-      query.inject(
-        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
-          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf),
       index.inject(
         constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
         .protocols(solrConf)
-    )
+    ).maxDuration((Config.totalTimeInMinutes.toInt + 5) minutes)
   }
   else {
     setUp(
       query.inject(
         rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
           (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf)
-    )
+    ).maxDuration((Config.totalTimeInMinutes.toInt + 5) minutes)
   }
 }

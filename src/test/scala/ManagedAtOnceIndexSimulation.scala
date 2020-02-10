@@ -115,7 +115,6 @@ class ManagedAtOnceIndexSimulation extends Simulation {
       }
 
       hasNextLine = record
-      System.out.println("records: " + records)
       Map(
         "record" -> records)
     }
