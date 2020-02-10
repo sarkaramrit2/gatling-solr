@@ -345,7 +345,7 @@ while read -r CLASS; do
     done
   done
 
-  if [ ! -z "${INDEX_GATLING_NODES}" ]; then
+  if [ ! -z "${INDEX_GATLING_NODES}" ] && [[ ${CLASS} != "Index"* ]]; then
     # generate the index reports
     for ((c = 0; c < ${INDEX_GATLING_NODES}; c++)); do
       docker exec kubectl-support mkdir -p /opt/index-results/reports-${c}-${CLASS}
