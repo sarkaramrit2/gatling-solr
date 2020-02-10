@@ -5,7 +5,7 @@ import java.util.{Properties, Scanner}
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import lucidworks.gatling.solr.Predef._
-
+import scala.concurrent.duration._
 import scala.util.control.Breaks._
 
 class IndexV1Simulation extends Simulation {
