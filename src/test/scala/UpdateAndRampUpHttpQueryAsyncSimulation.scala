@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 import scala.util.control.Breaks.break
 // required information to access the managed search service// required information to access the managed search service
 
-class UpdateAndRampUpHttpQuerySimulation extends Simulation {
+class UpdateAndRampUpHttpQueryAsyncSimulation extends Simulation {
 
   object Config {
 
@@ -324,30 +324,21 @@ class UpdateAndRampUpHttpQuerySimulation extends Simulation {
         .protocols(solrConf),
       update.inject(
         constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
-        .protocols(solrConf),
-      query.inject(
-        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
-          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf)
+        .protocols(solrConf)
     ).maxDuration((Config.totalTimeInMinutes.toInt + 5) minutes)
   }
   else if (!indexExecute && updateExecute) {
     setUp(
       update.inject(
         constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
-        .protocols(solrConf),
-      query.inject(
-        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
-          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf)
+        .protocols(solrConf)
     ).maxDuration((Config.totalTimeInMinutes.toInt + 5) minutes)
   }
   else if (indexExecute && !updateExecute) {
     setUp(
       index.inject(
         constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
-        .protocols(solrConf),
-      query.inject(
-        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
-          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf)
+        .protocols(solrConf)
     ).maxDuration((Config.totalTimeInMinutes.toInt + 5) minutes)
   }
   else {
