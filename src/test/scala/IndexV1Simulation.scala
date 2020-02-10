@@ -22,6 +22,7 @@ class IndexV1Simulation extends Simulation {
 
     val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
       "data/enwiki.random.lines.csv.txt")
+    val indexUrlPath = prop.getProperty("indexUrlPath", null)
     val numBatchesPerUser = prop.getProperty("numBatchesPerUser", "1")
     val maxNumUsers = prop.getProperty("maxNumUsers", "1")
     val minNumUsers = prop.getProperty("minNumUsers", "1")
