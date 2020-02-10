@@ -1,6 +1,6 @@
 import java.io.{File, FileReader}
 import java.net.URL
-import java.util.{Properties, Random, Scanner}
+import java.util.{Properties, Scanner}
 
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder

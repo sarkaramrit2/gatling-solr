@@ -2,10 +2,9 @@ import java.io.{File, FileReader}
 import java.net.URL
 import java.util.{Properties, Scanner}
 
-import lucidworks.gatling.solr.Predef._
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
-import org.apache.solr.client.solrj.impl.CloudSolrClient
+import lucidworks.gatling.solr.Predef._
 
 import scala.util.control.Breaks._
 
@@ -26,7 +25,7 @@ class IndexV1Simulation extends Simulation {
     val numBatchesPerUser = prop.getProperty("numBatchesPerUser", "1")
     val maxNumUsers = prop.getProperty("maxNumUsers", "1")
     val minNumUsers = prop.getProperty("minNumUsers", "1")
-    val totalTimeInMinutes = prop.getProperty("totalTimeInMinutes", "34")
+    val totalTimeInMinutes = prop.getProperty("totalTimeInMinutes", "20")
     val indexBatchSize = prop.getProperty("indexBatchSize", "5000")
     val zkHost = prop.getProperty("zkHost", "localhost:9983")
     val solrUrl = prop.getProperty("solrUrl", "http://localhost:8983/solr/")
@@ -155,7 +154,7 @@ class IndexV1Simulation extends Simulation {
 
   setUp(
     users.inject(
-      atOnceUsers(Config.maxNumUsers.toInt))
-  ).protocols(solrConf)
+      atOnceUsers(Config.maxNumUsers.toInt)).protocols(solrConf)
+  ).maxDuration((Config.totalTimeInMinutes.toInt + 5) minutes)
 
 }
