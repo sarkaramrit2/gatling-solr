@@ -7,6 +7,7 @@ import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import lucidworks.gatling.solr.Predef._
 import org.apache.solr.client.solrj.impl.HttpClientUtil
+import scala.concurrent.duration._
 
 import scala.util.control.Breaks.break
 
@@ -170,7 +171,7 @@ class ManagedAtOnceIndexV1Simulation extends Simulation {
 
   setUp(
     users.inject(
-      atOnceUsers(Config.maxNumUsers.toInt))
-  ).protocols(solrConf)
+      atOnceUsers(Config.maxNumUsers.toInt)).protocols(solrConf)
+  ).maxDuration((Config.totalTimeInMinutes.toInt + 5) minutes)
 
 }
