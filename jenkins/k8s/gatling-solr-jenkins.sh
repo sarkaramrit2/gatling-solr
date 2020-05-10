@@ -24,16 +24,20 @@ if [ "$IMPLICIT_CLUSTER" = true ]; then
   # TODO: hardcoded need to provide the check better, possible parameter passing
   ESTIMATED_NODES_1=$((ESTIMATED_NODES_1 + 4))
   ESTIMATED_NODES_2=$((ESTIMATED_NODES_2 + 4))
-  if [ "$GCP" = true ] ; then
+  if [ "$GCP" = "GCP" ] ; then
     cp ./jenkins/k8s/cluster-gcp-internal.yaml ./jenkins/k8s/cluster.yaml
-  else
+  elif [ "$GCP" = "AWS" ] ; then
     cp ./jenkins/k8s/cluster-aws-internal.yaml ./jenkins/k8s/cluster.yaml
+  elif [ "$GCP" = "AZURE" ] ; then
+    cp ./jenkins/k8s/cluster-azure-internal.yaml ./jenkins/k8s/cluster.yaml
   fi
 else
-  if [ "$GCP" = true ] ; then
+  if [ "$GCP" = "GCP" ] ; then
     cp ./jenkins/k8s/cluster-gcp-external.yaml ./jenkins/k8s/cluster.yaml
-  else
+  elif [ "$GCP" = "AWS" ] ; then
     cp ./jenkins/k8s/cluster-aws-external.yaml ./jenkins/k8s/cluster.yaml
+  elif [ "$GCP" = "AZURE" ] ; then
+    cp ./jenkins/k8s/cluster-azure-external.yaml ./jenkins/k8s/cluster.yaml
   fi
 fi
 

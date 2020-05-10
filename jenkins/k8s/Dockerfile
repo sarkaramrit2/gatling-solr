@@ -14,6 +14,7 @@ RUN \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
     apt-get update -y && apt-get install google-cloud-sdk kubectl -y && \
     apt-get install wget -y && \
+    curl -sL https://aka.ms/InstallAzureCLIDeb |    bash && \
     curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
     unzip awscli-bundle.zip && \
     ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws && \
