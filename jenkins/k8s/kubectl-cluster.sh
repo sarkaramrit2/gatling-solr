@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Fail if no simulation class if specified
-if [ -z "${GCP_KEY_FILE}" ]; then echo "GCP_KEY_FILE must be non-blank" && exit -1; fi
-
 set -e
 set -x
 
