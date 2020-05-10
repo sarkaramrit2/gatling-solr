@@ -47,6 +47,8 @@ if [ "$GCP" = "GCP" ] ; then
 elif [ "$GCP" = "AWS" ] ; then
  docker exec kubectl-support eksctl utils write-kubeconfig ${GCP_K8_CLUSTER_NAME}
 elif [ "$GCP" = "AZURE" ] ; then
+ set +x
  docker exec kubectl-support az login --service-principal --username f2b55349-dea4-4f42-bfc5-beb7ba083966 --password ${AZURE_PASSWORD} --tenant 2ec24434-5a6f-4604-bcdc-09e6dcf9f1fd
  docker exec kubectl-support az aks get-credentials --resource-group dz00-us-west-2 --name ${GCP_K8_CLUSTER_NAME}
+ set -x
 fi
