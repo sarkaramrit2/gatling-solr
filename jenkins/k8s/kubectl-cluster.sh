@@ -12,7 +12,7 @@ elif [ "$GCP" = "AWS" ] ; then
   rm -rf ./GCP_KEY_FILE
 elif [ "$GCP" = "AZURE" ] ; then
   #set +x
-  az login --service-principal --username f2b55349-dea4-4f42-bfc5-beb7ba083966 --password ${AZURE_PASSWORD} --tenant 2ec24434-5a6f-4604-bcdc-09e6dcf9f1fd
+  docker run -it -d --rm az login --service-principal --username f2b55349-dea4-4f42-bfc5-beb7ba083966 --password ${AZURE_PASSWORD} --tenant 2ec24434-5a6f-4604-bcdc-09e6dcf9f1fd
   #set -x
 fi
 
