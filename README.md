@@ -54,15 +54,17 @@ cp target/gatling-solr*.jar GATLING_HOME/lib/
 
 ## DSL
 
+```
 val solrConf = solr.zkhost(Config.zkHost).collection(Config.defaultCollection)
  .numClients(Config.numClients.toInt).properties(Config.prop)
 
 solr("queryRequest")
      // query to do
      .query[String](Config.basequery)
+```
 
 Sample code for Query:
-
+```
 object Query {
  // construct a feeder for our query params stored in the csv
  val feeder = tsv(Config.queryFeederSource).circular
@@ -88,9 +90,9 @@ setUp(
    rampUsersPerSec(Config.minNumUsers.toDouble) to Config.maxNumUsers.toDouble during
      (Config.totalTimeInMinutes.toDouble minutes))
 ).protocols(solrConf)
-
+```
 Sample code for Index:
-
+```
 object Index {
  // construct a feeder for content stored in CSV file
  val feeder = solrIndexV2Feeder
@@ -113,7 +115,7 @@ setUp(
  users.inject(
    atOnceUsers(Config.maxNumUsers.toInt))
 ).protocols(solrConf)
-
+```
 
 Property file path must be defined in the Simulation scala file.
 
