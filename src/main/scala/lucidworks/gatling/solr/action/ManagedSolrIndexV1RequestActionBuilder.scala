@@ -3,6 +3,7 @@ package lucidworks.gatling.solr.action
 import java.util
 import java.util.Collections
 
+import com.lucidworks.cloud.ManagedSearchClusterStateProvider
 import io.gatling.core.action.Action
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.structure.ScenarioContext
@@ -22,7 +23,7 @@ class ManagedSolrIndexV1RequestActionBuilder[K, V](solrAttributes: SolrIndexAttr
 
     for( i <- 0 until solrComponents.solrProtocol.numClients){
       var solrClient= null: CloudSolrClient;
-      solrClient = new CloudSolrClient.Builder(Collections.singletonList(solrComponents.solrProtocol.solrurl)).build
+      solrClient = new CloudSolrClient.Builder(new ManagedSearchClusterStateProvider(Collections.singletonList(solrComponents.solrProtocol.solrurl))).build
       solrClient.setDefaultCollection(solrComponents.solrProtocol.collection)
       solrClients.add(solrClient)
     }

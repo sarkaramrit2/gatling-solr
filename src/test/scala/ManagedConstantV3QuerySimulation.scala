@@ -1,7 +1,7 @@
 import java.util.concurrent.TimeUnit
 import java.util.{Collections, Properties}
 
-import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
+import com.lucidworks.cloud.{ManagedSearchClusterStateProvider, OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
 import io.gatling.core.Predef._
 import lucidworks.gatling.solr.Predef._
 import org.apache.solr.client.solrj.impl.{CloudSolrClient, HttpClientUtil}
@@ -60,7 +60,7 @@ class ManagedConstantV3QuerySimulation extends Simulation {
   // register http request interceptor with solrj
   HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
 
-  val client = new CloudSolrClient.Builder(Collections.singletonList(Config.solrUrl)).build()
+  val client = new CloudSolrClient.Builder(new ManagedSearchClusterStateProvider(Collections.singletonList(Config.solrUrl))).build()
   client.setDefaultCollection(Config.defaultCollection)
   client.commit(false, true)
 

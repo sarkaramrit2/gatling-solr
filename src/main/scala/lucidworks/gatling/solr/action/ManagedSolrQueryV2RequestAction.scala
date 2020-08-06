@@ -1,13 +1,16 @@
 package lucidworks.gatling.solr.action
 
 import java.nio.charset.Charset
+import java.util.Collections
 
+import com.lucidworks.cloud.ManagedSearchClusterStateProvider
 import io.gatling.commons.stats.{KO, OK}
 import io.gatling.commons.util.DefaultClock
 import io.gatling.commons.validation.Validation
 import io.gatling.core.CoreComponents
 import io.gatling.core.action.{Action, ExitableAction}
 import io.gatling.core.session._
+import io.gatling.core.stats.StatsEngine
 import io.gatling.core.util.NameGen
 import lucidworks.gatling.solr.protocol.SolrProtocol
 import lucidworks.gatling.solr.request.builder.SolrQueryAttributes
@@ -26,8 +29,8 @@ class ManagedSolrQueryV2RequestAction[K, V](val solrAttributes: SolrQueryAttribu
                                             val next: Action)
   extends ExitableAction with NameGen {
 
-  override val name = genName("solrQueryRequest")
-  val statsEngine = coreComponents.statsEngine
+  override val name: String = genName("solrQueryRequest")
+  val statsEngine: StatsEngine = coreComponents.statsEngine
   val clock = new DefaultClock
 
   override def execute(session: Session): Unit = recover(session) {
@@ -35,7 +38,7 @@ class ManagedSolrQueryV2RequestAction[K, V](val solrAttributes: SolrQueryAttribu
     solrAttributes requestName session flatMap { requestName =>
 
       var solrClient= null: CloudSolrClient;
-      solrClient = new CloudSolrClient.Builder().withSolrUrl(solrProtocol.solrurl).build()
+      solrClient = new CloudSolrClient.Builder(new ManagedSearchClusterStateProvider(Collections.singletonList(solrProtocol.solrurl))).build
       solrClient.setDefaultCollection(solrProtocol.collection)
 
       val outcome =

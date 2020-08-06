@@ -1,18 +1,15 @@
 package lucidworks.gatling.solr.action
 
 import java.util
-import java.util.concurrent.TimeUnit
 import java.util.{Base64, Collections}
 
-import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
+import com.lucidworks.cloud.{ManagedSearchClusterStateProvider, OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
 import io.gatling.core.action.Action
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.structure.ScenarioContext
 import lucidworks.gatling.solr.protocol.{SolrComponents, SolrProtocol}
 import lucidworks.gatling.solr.request.builder.SolrQueryAttributes
-import org.apache.http.HttpRequest
-import org.apache.http.protocol.HttpContext
-import org.apache.solr.client.solrj.impl.{CloudSolrClient, HttpClientUtil}
+import org.apache.solr.client.solrj.impl.CloudSolrClient
 
 
 class ManagedSolrQueryRequestActionBuilder[K](solrAttributes: SolrQueryAttributes[K]) extends ActionBuilder {
@@ -28,7 +25,7 @@ class ManagedSolrQueryRequestActionBuilder[K](solrAttributes: SolrQueryAttribute
     // create http request interceptor and start it
 
     for (i <- 0 until solrComponents.solrProtocol.numClients) {
-      solrClient = new CloudSolrClient.Builder(Collections.singletonList(solrComponents.solrProtocol.solrurl)).build
+      solrClient = new CloudSolrClient.Builder(new ManagedSearchClusterStateProvider(Collections.singletonList(solrComponents.solrProtocol.solrurl))).build
       solrClient.setDefaultCollection(solrComponents.solrProtocol.collection)
       solrClients.add(solrClient)
     }

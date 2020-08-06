@@ -6,8 +6,7 @@ import io.gatling.core.Predef._
 import org.apache.solr.client.solrj.impl.CloudSolrClient
 
 import scala.concurrent.duration._
-import com.lucidworks.cloud.OAuth2HttpRequestInterceptor
-import com.lucidworks.cloud.OAuth2HttpRequestInterceptorBuilder
+import com.lucidworks.cloud.{ManagedSearchClusterStateProvider, OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
 import org.apache.solr.client.solrj.impl.HttpClientUtil
 // required information to access the managed search service// required information to access the managed search service
 
@@ -62,7 +61,7 @@ class ManagedConstantQuerySimulation extends Simulation {
   // register http request interceptor with solrj
   HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
 
-  val client = new CloudSolrClient.Builder(Collections.singletonList(Config.solrUrl)).build()
+  val client = new CloudSolrClient.Builder(new ManagedSearchClusterStateProvider(Collections.singletonList(Config.solrUrl))).build()
   client.setDefaultCollection(Config.defaultCollection)
   client.commit(false, true)
 

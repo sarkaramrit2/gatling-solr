@@ -3,7 +3,7 @@ import java.net.URL
 import java.util.concurrent.TimeUnit
 import java.util.{Collections, Properties, Scanner}
 
-import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
+import com.lucidworks.cloud.{ManagedSearchClusterStateProvider, OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import lucidworks.gatling.solr.Predef._
@@ -296,7 +296,7 @@ class ManagedUpdateAndRampUpV3QuerySimulation extends Simulation {
   // register http request interceptor with solrj
   HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
 
-  val client = new CloudSolrClient.Builder(Collections.singletonList(Config.solrUrl)).build()
+  val client = new CloudSolrClient.Builder(new ManagedSearchClusterStateProvider(Collections.singletonList(Config.solrUrl))).build()
   client.setDefaultCollection(Config.defaultCollection)
   client.commit(false, true)
 

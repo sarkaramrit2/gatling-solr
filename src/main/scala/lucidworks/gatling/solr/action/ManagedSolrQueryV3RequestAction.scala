@@ -1,7 +1,9 @@
 package lucidworks.gatling.solr.action
 
 import java.nio.charset.Charset
+import java.util.Collections
 
+import com.lucidworks.cloud.ManagedSearchClusterStateProvider
 import io.gatling.commons.stats.{KO, OK}
 import io.gatling.commons.util.DefaultClock
 import io.gatling.commons.validation.Validation
@@ -60,7 +62,7 @@ class ManagedSolrQueryV3RequestAction[K, V](val solrAttributes: SolrQueryAttribu
     solrAttributes payload session map { payload =>
 
       var solrClient= null: CloudSolrClient;
-      solrClient = new CloudSolrClient.Builder().withSolrUrl(solrProtocol.solrurl).build()
+      solrClient = new CloudSolrClient.Builder(new ManagedSearchClusterStateProvider(Collections.singletonList(solrProtocol.solrurl))).build
       solrClient.setDefaultCollection(solrProtocol.collection)
 
       val params = new ModifiableSolrParams();
