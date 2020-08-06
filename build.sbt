@@ -22,3 +22,8 @@ assemblyOption in assembly := (assemblyOption in assembly).value
   .copy(includeScala = false)
 
 Compile / unmanagedJars := (baseDirectory.value / "custom-libs" ** "*.jar").classpath
+
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case x => MergeStrategy.first
+}
