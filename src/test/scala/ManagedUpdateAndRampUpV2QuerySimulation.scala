@@ -113,26 +113,27 @@ class ManagedUpdateAndRampUpV2QuerySimulation extends Simulation {
         false
       }
       else {
+        scanner.close()
+        if (Config.indexUrlPath == null) {
+          fileReader.close()
+        }
         if (podNo + Config.indexParallelNodes.toInt > Config.indexTotalFiles.toInt) {
-          false
+          podNo = (podNo + Config.indexParallelNodes.toInt)
+          podNo = Math.floorMod(podNo, Config.indexTotalFiles.toInt)
         }
         else {
-          scanner.close()
-          if (Config.indexUrlPath == null) {
-            fileReader.close()
-          }
           podNo = podNo + Config.indexParallelNodes.toInt
-          if (Config.indexUrlPath != null) {
-            url = new URL(Config.indexUrlPath + Config.podNo)
-            scanner = new Scanner(url.openStream())
-          }
-          else {
-            indexFile = new File(Config.indexFilePath + Config.podNo)
-            fileReader = new FileReader(indexFile)
-            scanner = new Scanner(fileReader)
-          }
-          true
         }
+        if (Config.indexUrlPath != null) {
+          url = new URL(Config.indexUrlPath + Config.podNo)
+          scanner = new Scanner(url.openStream())
+        }
+        else {
+          indexFile = new File(Config.indexFilePath + Config.podNo)
+          fileReader = new FileReader(indexFile)
+          scanner = new Scanner(fileReader)
+        }
+        true
       }
     }
     else {
@@ -202,26 +203,27 @@ class ManagedUpdateAndRampUpV2QuerySimulation extends Simulation {
         false
       }
       else {
+        scanner.close()
+        if (Config.updateUrlPath == null) {
+          fileReader.close()
+        }
         if (podNo + Config.updateParallelNodes.toInt > Config.updateTotalFiles.toInt) {
-          false
+          podNo = (podNo + Config.updateParallelNodes.toInt)
+          podNo = Math.floorMod(podNo, Config.updateTotalFiles.toInt)
         }
         else {
-          scanner.close()
-          if (Config.updateUrlPath == null) {
-            fileReader.close()
-          }
           podNo = podNo + Config.updateParallelNodes.toInt
-          if (Config.updateUrlPath != null) {
-            url = new URL(Config.updateUrlPath + Config.podNo)
-            scanner = new Scanner(url.openStream())
-          }
-          else {
-            updateFile = new File(Config.updateFilePath + Config.podNo)
-            fileReader = new FileReader(updateFile)
-            scanner = new Scanner(fileReader)
-          }
-          true
         }
+        if (Config.updateUrlPath != null) {
+          url = new URL(Config.updateUrlPath + Config.podNo)
+          scanner = new Scanner(url.openStream())
+        }
+        else {
+          updateFile = new File(Config.updateFilePath + Config.podNo)
+          fileReader = new FileReader(updateFile)
+          scanner = new Scanner(fileReader)
+        }
+        true
       }
     }
     else {

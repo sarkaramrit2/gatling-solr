@@ -1,14 +1,15 @@
 import java.io.{File, FileReader}
 import java.net.URL
-import java.util.{Properties, Scanner}
+import java.util.concurrent.TimeUnit
+import java.util.{Collections, Properties, Scanner}
 
-import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
+import com.lucidworks.cloud.{ManagedSearchClusterStateProvider, OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import lucidworks.gatling.solr.Predef._
-import org.apache.solr.client.solrj.impl.HttpClientUtil
-import scala.concurrent.duration._
+import org.apache.solr.client.solrj.impl.{CloudSolrClient, HttpClientUtil}
 
+import scala.concurrent.duration._
 import scala.util.control.Breaks.break
 
 class ManagedAtOnceIndexV1Simulation extends Simulation {
@@ -158,13 +159,18 @@ class ManagedAtOnceIndexV1Simulation extends Simulation {
   // create http request interceptor and start it
   val oauth2HttpRequestInterceptor: OAuth2HttpRequestInterceptor = new OAuth2HttpRequestInterceptorBuilder(Config.oauth2CustomerId, oauth2ClientId, oauth2ClientSecret).build
   oauth2HttpRequestInterceptor.start()
+  oauth2HttpRequestInterceptor.awaitFirstRefresh(60, TimeUnit.SECONDS);
 
   // register http request interceptor with solrj
   HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
 
-  // pass zookeeper string, default collection to index, poolSize for CloudSolrClients
-  val solrConf = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection)
-    .numClients(Config.numClients.toInt).properties(Config.prop)
+  val client = new CloudSolrClient.Builder(new ManagedSearchClusterStateProvider(Collections.singletonList(Config.solrUrl))).build()
+  client.setDefaultCollection(Config.defaultCollection)
+  client.commit(false, true)
+
+  // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
+  val solrConf = solr.solrurl(Config.solrUrl).customerId(Config.oauth2CustomerId).collection(Config.defaultCollection).numClients(Config.numClients.toInt).
+    properties(Config.prop).authClientId(oauth2ClientId).authClientSecret(oauth2ClientSecret)
 
   // A scenario where users execute queries
   val users = scenario("Users").exec(Index.search)
