@@ -7,13 +7,20 @@ import com.lucidworks.cloud.{ManagedSearchClusterStateProvider, OAuth2HttpReques
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import lucidworks.gatling.solr.Predef._
-import org.apache.solr.client.solrj.impl.{CloudSolrClient, HttpClientUtil}
+import org.apache.http.impl.client.CloseableHttpClient
+import org.apache.solr.client.solrj.impl.CloudSolrClient
 
 import scala.concurrent.duration._
 import scala.util.control.Breaks.break
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
+import org.apache.solr.client.solrj.impl.HttpClientUtil
+import org.apache.solr.common.params.ModifiableSolrParams
 // required information to access the managed search service// required information to access the managed search service
 
 class ManagedUpdateAndRampUpV3QuerySimulation extends Simulation {
+
+  val DEFAULT_SO_TIMEOUT = 600000
+  val DEFAULT_CONNECT_TIMEOUT = 60000
 
   object Config {
 
@@ -285,10 +292,17 @@ class ManagedUpdateAndRampUpV3QuerySimulation extends Simulation {
     }
   }
 
-  val clientId = Option(System.getenv("OAUTH2_CLIENT_ID"))
+  val clientId: Option[String] = Option(System.getenv("OAUTH2_CLIENT_ID"))
   val oauth2ClientId: String = if (clientId.isDefined) clientId.get else System.getProperty("OAUTH2_CLIENT_ID")
-  val clientSecret = Option(System.getenv("OAUTH2_CLIENT_SECRET"))
+  val clientSecret: Option[String] = Option(System.getenv("OAUTH2_CLIENT_SECRET"))
   val oauth2ClientSecret: String = if (clientSecret.isDefined) clientSecret.get else System.getProperty("OAUTH2_CLIENT_SECRET")
+
+  val clientConnectionManager = new PoolingHttpClientConnectionManager
+  val clientParams = new ModifiableSolrParams
+  clientConnectionManager.setMaxTotal(100)
+  clientConnectionManager.setDefaultMaxPerRoute(100)
+  clientParams.set(HttpClientUtil.PROP_SO_TIMEOUT, DEFAULT_SO_TIMEOUT)
+  clientParams.set(HttpClientUtil.PROP_CONNECTION_TIMEOUT, DEFAULT_CONNECT_TIMEOUT)
 
   // create http request interceptor and start it
   val oauth2HttpRequestInterceptor: OAuth2HttpRequestInterceptor = new OAuth2HttpRequestInterceptorBuilder(Config.oauth2CustomerId, oauth2ClientId, oauth2ClientSecret).build
@@ -298,7 +312,9 @@ class ManagedUpdateAndRampUpV3QuerySimulation extends Simulation {
   // register http request interceptor with solrj
   HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
 
-  val client = new CloudSolrClient.Builder(new ManagedSearchClusterStateProvider(Collections.singletonList(Config.solrUrl))).build()
+  val closeHttpClient: CloseableHttpClient = HttpClientUtil.createClient(clientParams, clientConnectionManager, false, null)
+
+  val client = new CloudSolrClient.Builder(new ManagedSearchClusterStateProvider(Collections.singletonList(Config.solrUrl), closeHttpClient)).build
   client.setDefaultCollection(Config.defaultCollection)
   client.commit(false, true)
 

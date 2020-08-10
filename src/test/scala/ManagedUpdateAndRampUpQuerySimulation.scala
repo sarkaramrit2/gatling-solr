@@ -301,7 +301,8 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
   client.commit(false, true)
 
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
-  val solrConf = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection).numClients(Config.numClients.toInt).properties(Config.prop)
+  val solrConf = solr.solrurl(Config.solrUrl).customerId(Config.oauth2CustomerId).collection(Config.defaultCollection).numClients(Config.numClients.toInt).
+    properties(Config.prop).authClientId(oauth2ClientId).authClientSecret(oauth2ClientSecret)
 
   // A scenario where users execute queries
   val query = scenario("QUERY").exec(Query.search)
