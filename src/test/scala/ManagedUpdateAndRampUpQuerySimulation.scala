@@ -1,4 +1,5 @@
 import java.io.{File, FileReader}
+import java.lang.invoke.MethodHandles
 import java.net.URL
 import java.util.concurrent.TimeUnit
 import java.util.{Collections, Properties, Scanner}
@@ -8,12 +9,15 @@ import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import lucidworks.gatling.solr.Predef._
 import org.apache.solr.client.solrj.impl.{CloudSolrClient, HttpClientUtil}
+import org.slf4j.{LoggerFactory}
 
 import scala.concurrent.duration._
 import scala.util.control.Breaks.break
 // required information to access the managed search service// required information to access the managed search service
 
 class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
+
+  private val log = LoggerFactory.getLogger(MethodHandles.lookup.lookupClass)
 
   object Config {
 
@@ -80,20 +84,25 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
     if (Config.indexTotalFiles.toInt <= 1) {
       if (Config.indexUrlPath != null) {
         System.out.println("indexUrl: " + Config.indexUrlPath)
+        log.info("indexUrl: " + Config.indexUrlPath)
         url = new URL(Config.indexUrlPath)
       }
       else {
         System.out.println("indexFile: " + Config.indexFilePath)
+        log.info("indexUrl: " + Config.indexUrlPath)
         indexFile = new File(Config.indexFilePath)
       }
     }
     else {
       if (Config.indexUrlPath != null) {
         System.out.println("indexUrl: " + Config.indexUrlPath + Config.podNo)
+        log.info("indexUrl: " + Config.indexUrlPath  + Config.podNo)
         url = new URL(Config.indexUrlPath + Config.podNo)
       }
       else {
         System.out.println("indexFile: " + Config.indexFilePath + Config.podNo)
+        log.info("indexFile: " + Config.indexFilePath + Config.podNo)
+
         indexFile = new File(Config.indexFilePath + Config.podNo)
       }
     }
@@ -170,20 +179,24 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
     if (Config.updateTotalFiles.toInt <= 1) {
       if (Config.updateUrlPath != null) {
         System.out.println("updateUrl: " + Config.updateUrlPath)
+        log.info("updateUrl: " + Config.updateUrlPath)
         url = new URL(Config.updateUrlPath)
       }
       else {
         System.out.println("updateFile: " + Config.updateFilePath)
+        log.info("updateFile: " + Config.updateFilePath)
         updateFile = new File(Config.updateFilePath)
       }
     }
     else {
       if (Config.updateUrlPath != null) {
         System.out.println("updateUrl: " + Config.updateUrlPath + Config.podNo)
+        log.info("updateUrl: " + Config.updateUrlPath + Config.podNo)
         url = new URL(Config.updateUrlPath + Config.podNo)
       }
       else {
         System.out.println("updateFile: " + Config.updateFilePath + Config.podNo)
+        log.info("updateFile: " + Config.updateFilePath + Config.podNo)
         updateFile = new File(Config.updateFilePath + Config.podNo)
       }
     }
@@ -313,18 +326,21 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
 
   val update = scenario("UPDATE").exec(Update.search)
 
-  var indexExecute: Boolean = true
-  var updateExecute: Boolean = true
+  System.out.println("podNo: " + Config.podNo.toInt)
+  log.info("podNo: " + Config.podNo.toInt)
+
+  var indexExecute: Boolean = false
+  var updateExecute: Boolean = false
 
   if (Config.indexParallelNodes.toInt > 1 && Config.indexTotalFiles.toInt > 1) {
-    if (Config.podNo.toInt > Config.indexTotalFiles.toInt) {
-      indexExecute = false
+    if (Config.podNo.toInt < Config.indexParallelNodes.toInt && Config.podNo.toInt <= Config.indexTotalFiles.toInt) {
+      indexExecute = true
     }
   }
 
   if (Config.updateParallelNodes.toInt > 1 && Config.updateTotalFiles.toInt > 1) {
-    if (Config.podNo.toInt > Config.updateTotalFiles.toInt) {
-      updateExecute = false
+    if (Config.podNo.toInt < Config.updateParallelNodes.toInt && Config.podNo.toInt <= Config.updateTotalFiles.toInt) {
+      updateExecute = true
     }
   }
 

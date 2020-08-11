@@ -315,18 +315,18 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
 
   val update = scenario("UPDATE").exec(Update.search)
 
-  var indexExecute: Boolean = true
-  var updateExecute: Boolean = true
+  var indexExecute: Boolean = false
+  var updateExecute: Boolean = false
 
-  if (Config.indexParallelNodes.toInt > 1) {
-    if (Config.podNo.toInt >= Config.indexParallelNodes.toInt) {
-      indexExecute = false
+  if (Config.indexParallelNodes.toInt > 1 && Config.indexTotalFiles.toInt > 1) {
+    if (Config.podNo.toInt < Config.indexParallelNodes.toInt && Config.podNo.toInt <= Config.indexTotalFiles.toInt) {
+      indexExecute = true
     }
   }
 
-  if (Config.updateParallelNodes.toInt > 1) {
-    if (Config.podNo.toInt >= Config.updateParallelNodes.toInt) {
-      updateExecute = false
+  if (Config.updateParallelNodes.toInt > 1 && Config.updateTotalFiles.toInt > 1) {
+    if (Config.podNo.toInt < Config.updateParallelNodes.toInt && Config.podNo.toInt <= Config.updateTotalFiles.toInt) {
+      updateExecute = true
     }
   }
 
