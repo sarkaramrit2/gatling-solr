@@ -330,9 +330,6 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
 
   if (indexExecute && updateExecute) {
     setUp(
-      query.inject(
-        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
-          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf),
       index.inject(
         constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
         .protocols(solrConf),
@@ -343,9 +340,6 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
   }
   else if (!indexExecute && updateExecute) {
     setUp(
-      query.inject(
-        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
-          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf),
       update.inject(
         constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
         .protocols(solrConf)
@@ -353,9 +347,6 @@ class ManagedUpdateAndRampUpQuerySimulation extends Simulation {
   }
   else if (indexExecute && !updateExecute) {
     setUp(
-      query.inject(
-        rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
-          (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf),
       index.inject(
         constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
         .protocols(solrConf)
