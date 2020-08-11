@@ -4,7 +4,7 @@ import java.util
 
 import lucidworks.gatling.solr.action._
 import io.gatling.core.session._
-import lucidworks.gatling.solr.action.{ManagedSolrIndexRequestActionBuilder, ManagedSolrQueryRequestActionBuilder, SolrIndexRequestActionBuilder, SolrIndexV2RequestActionBuilder, SolrQueryRequestActionBuilder}
+import lucidworks.gatling.solr.action.{ManagedSolrQueryRequestActionBuilder, SolrIndexRequestActionBuilder, SolrQueryRequestActionBuilder}
 import org.apache.solr.common.SolrInputDocument
 
 case class SolrQueryAttributes[K](requestName: Expression[String],
@@ -25,31 +25,12 @@ case class SolrRequestBuilder(requestName: Expression[String]) {
   def query[K](payload: Expression[String]): SolrQueryRequestActionBuilder[K] =
     new SolrQueryRequestActionBuilder(SolrQueryAttributes(requestName, payload))
 
-  def queryV2[K](payload: Expression[String]): SolrQueryV2RequestActionBuilder[K] =
-    new SolrQueryV2RequestActionBuilder(SolrQueryAttributes(requestName, payload))
-
-  def queryV3[K](payload: Expression[String]): SolrQueryV3RequestActionBuilder[K] =
-    new SolrQueryV3RequestActionBuilder(SolrQueryAttributes(requestName, payload))
-
   def index[K, V](header: String, payload: Expression[String]): SolrIndexRequestActionBuilder[K, V] =
     new SolrIndexRequestActionBuilder(SolrIndexAttributes(requestName, header, payload))
 
   def managedIndexV1[K, V](header: String, payload: Expression[String]): ManagedSolrIndexV1RequestActionBuilder[K, V] =
     new ManagedSolrIndexV1RequestActionBuilder(SolrIndexAttributes(requestName, header, payload))
 
-  def indexV2[K, V](header: String, payload: util.ArrayList[SolrInputDocument]): SolrIndexV2RequestActionBuilder[K, V] =
-    new SolrIndexV2RequestActionBuilder(SolrIndexV2Attributes(requestName, header, payload))
-
   def managedQuery[K](payload: Expression[String]): ManagedSolrQueryRequestActionBuilder[K] =
     new ManagedSolrQueryRequestActionBuilder(SolrQueryAttributes(requestName, payload))
-
-  def managedQueryV2[K](payload: Expression[String]): ManagedSolrQueryV2RequestActionBuilder[K] =
-    new ManagedSolrQueryV2RequestActionBuilder(SolrQueryAttributes(requestName, payload))
-
-  def managedQueryV3[K](payload: Expression[String]): ManagedSolrQueryV3RequestActionBuilder[K] =
-    new ManagedSolrQueryV3RequestActionBuilder(SolrQueryAttributes(requestName, payload))
-
-  def managedIndex[K, V](header: String, payload: util.ArrayList[SolrInputDocument]): ManagedSolrIndexRequestActionBuilder[K, V] =
-    new ManagedSolrIndexRequestActionBuilder(SolrIndexV2Attributes(requestName, header, payload))
-
 }
