@@ -14,7 +14,8 @@ libraryDependencies ++= Seq(
   "com.opencsv" % "opencsv" % "4.4" % "provided",
   ("org.apache.solr" % "solr-solrj" % "8.4.1")
     // Gatling contains slf4j-api
-    .exclude("org.slf4j", "slf4j-api")
+    .exclude("org.slf4j", "slf4j-api"),
+  "ch.qos.logback" % "logback-classic" % "1.2.3"
 )
 
 // Gatling contains scala-library
