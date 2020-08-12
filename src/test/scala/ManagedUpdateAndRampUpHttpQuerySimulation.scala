@@ -356,7 +356,7 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
   val solrConf = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection).numClients(Config.numClients.toInt).properties(Config.prop)
 
   // A scenario where users execute queries
-  val query = scenario("QUERY").exec(Query.search)
+  val query = scenario("QUERY").exec(Query.saveGlobalJWTInSession).exec(Query.search)
 
   val index = scenario("INDEX").exec(Index.search)
 

@@ -41,7 +41,7 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
       val outcome =
         sendRequest(
           requestName,
-          //solrClients.get((session.userId % solrClients.size).toInt), // round robin for solrclients
+          solrClients.get((session.userId % solrClients.size).toInt), // round robin for solrclients
           solrAttributes,
           throttled,
           session)
@@ -58,7 +58,7 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
   }
 
   private def sendRequest(requestName: String,
-                          //solrClient: CloudSolrClient,
+                          solrClient: CloudSolrClient,
                           solrAttributes: SolrQueryAttributes[V],
                           throttled: Boolean,
                           session: Session): Validation[Unit] = {
@@ -73,7 +73,7 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
       val requestStartDate = clock.nowMillis
       var response: QueryResponse = null
       try {
-        response = solrClients.get((session.userId % solrClients.size).toInt).query(params)
+        response = solrClient.query(params)
       }
       catch {
         case ex: Exception => {

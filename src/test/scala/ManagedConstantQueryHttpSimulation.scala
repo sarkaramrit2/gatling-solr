@@ -125,7 +125,7 @@ class ManagedConstantQueryHttpSimulation extends Simulation {
     .numClients(Config.numClients.toInt).properties(Config.prop)
 
   // A scenario where users execute queries
-  val users = scenario("Users").exec(Query.search)
+  val users = scenario("Users").exec(Query.saveGlobalJWTInSession).exec(Query.search)
 
   setUp(
     users.inject(
