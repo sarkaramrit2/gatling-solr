@@ -1,14 +1,16 @@
 import java.io.{File, FileReader}
 import java.net.URL
-import java.util.concurrent.TimeUnit
-import java.util.{Collections, Properties, Scanner}
+import java.util.concurrent.{Executors, ThreadFactory, TimeUnit}
+import java.util.{Properties, Scanner}
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import io.gatling.http.Predef._
 import lucidworks.gatling.solr.Predef._
-import org.apache.solr.client.solrj.impl.{CloudSolrClient, HttpClientUtil}
+import org.apache.solr.client.solrj.impl.{HttpClientUtil}
+import scalaj.http.Http
 
 import scala.concurrent.duration._
 import scala.util.control.Breaks.break
@@ -66,10 +68,54 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
 
     val podNo = if (System.getenv("POD_NAME") != null) {
       System.getenv("POD_NAME")
-      }.split("-")(1)
+    }.split("-")(1)
     else {
       "gatlingsolr-1"
-      }.split("-")(1)
+    }.split("-")(1)
+
+    val jsonObjectMapper = new ObjectMapper()
+    var jwtToken = ""
+    var jwtExpiresIn : Long = 1790L
+
+    def updateJwtToken() = {
+      val loginUrl = s"https://pg01.us-west1.cloud.lucidworks.com/oauth2/default/" + Config.oauth2CustomerId + "/v1/token"
+      val jsonResp = Http(loginUrl).postData("grant_type=client_credentials&scope=com.lucidworks.cloud.search.solr.customer")
+        .header("authorization", "Basic MG9hY3FobHJoU3U1Q0k1ODkzNTY6bnZhZmtBVUxoeEJCc1JXUGZKRmtXR0JVd1J3bVZCV1lhaHpxak0zdQ==")
+        .header("accept", "application/json")
+        .header("cache-control", "no-cache")
+        .header("content-type", "application/x-www-form-urlencoded")
+        .execute(parser = {inputStream => jsonObjectMapper.readTree(inputStream)})
+      if (!jsonResp.is2xx) throw new RuntimeException(s"Failed to login to ${loginUrl} due to: ${jsonResp.code}")
+      jwtToken = jsonResp.body.get("access_token").asText()
+      val expires_in = jsonResp.body.get("expires_in").asLong()
+      val grace_secs = if (expires_in > 15L) 10L else 2L
+      jwtExpiresIn = expires_in - grace_secs
+      println(s"Successfully refreshed global JWT for load test ... will do again in ${jwtExpiresIn} secs")
+    }
+
+    // This function is rife with side-effects ;-)
+    def initJwtAndStartBgRefreshThread(): Unit = {
+
+      // Get the initial token ...
+      updateJwtToken()
+      println(s"Received initial JWT from POST to https://pg01.us-west1.cloud.lucidworks.com/oauth2/token: ${jwtToken}\n")
+
+      // Schedule a background task to refresh it before the token expires
+      // Make the thread a daemon so the JVM can exit
+      class DaemonFactory extends ThreadFactory {
+        override def newThread(r: Runnable): Thread = {
+          val t = new Thread(r)
+          t.setDaemon(true)
+          t
+        }
+      }
+      val ex = Executors.newSingleThreadScheduledExecutor(new DaemonFactory)
+      val task = new Runnable {
+        def run(): Unit = updateJwtToken()
+      }
+      ex.scheduleAtFixedRate(task, jwtExpiresIn, jwtExpiresIn, TimeUnit.SECONDS)
+      println(s"Started background thread to refresh JWT in ${jwtExpiresIn} seconds from now ...\n")
+    }
 
   }
 
@@ -274,17 +320,18 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
 
   object Query {
     // construct a feeder for our query params stored in the csv
+
+    Config.initJwtAndStartBgRefreshThread()
+
     val feeder = tsv(Config.queryFeederSource).circular
 
-    val authToken = Option(System.getenv("AUTH_TOKEN"))
-    val authTokenVal: String = if (authToken.isDefined) authToken.get else System.getProperty("AUTH_TOKEN")
-    println("token: " + authTokenVal)
+    val saveGlobalJWTInSession = exec { session => session.set("jwt", Config.jwtToken) }
 
     // each user sends loops queries
     val search = feed(feeder).exec(
       http("QueryRequest").
         get(Config.solrUrl + "/" + Config.defaultCollection + "/select?" + Config.basequery).
-        header("Authorization", "Bearer " + authTokenVal))
+        header("Authorization", "Bearer " + saveGlobalJWTInSession).check(status.in(200, 204)))
 
   }
 
@@ -301,9 +348,9 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
   // register http request interceptor with solrj
   HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
 
-//  val client = new CloudSolrClient.Builder(Collections.singletonList(Config.solrUrl)).build()
-//  client.setDefaultCollection(Config.defaultCollection)
-//  client.commit(false, true)
+  //  val client = new CloudSolrClient.Builder(Collections.singletonList(Config.solrUrl)).build()
+  //  client.setDefaultCollection(Config.defaultCollection)
+  //  client.commit(false, true)
 
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
   val solrConf = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection).numClients(Config.numClients.toInt).properties(Config.prop)

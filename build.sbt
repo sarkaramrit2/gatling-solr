@@ -15,7 +15,8 @@ libraryDependencies ++= Seq(
   ("org.apache.solr" % "solr-solrj" % "8.4.1")
     // Gatling contains slf4j-api
     .exclude("org.slf4j", "slf4j-api"),
-  "ch.qos.logback" % "logback-classic" % "1.2.3"
+  "ch.qos.logback" % "logback-classic" % "1.2.3",
+  "org.scalaj" % "scalaj-http_2.12" % "2.4.2"
 )
 
 // Gatling contains scala-library
