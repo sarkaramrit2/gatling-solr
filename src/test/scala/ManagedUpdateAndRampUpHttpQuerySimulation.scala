@@ -331,7 +331,7 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
     val search = feed(feeder).exec(
       http("QueryRequest").
         get(Config.solrUrl + "/" + Config.defaultCollection + "/select?" + Config.basequery).
-        header("Authorization", "Bearer " + saveGlobalJWTInSession).check(status.in(200, 204)))
+        header("Authorization", "Bearer ${jwt}").check(status.in(200, 204)))
 
   }
 

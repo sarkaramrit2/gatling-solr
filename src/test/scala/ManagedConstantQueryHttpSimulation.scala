@@ -50,9 +50,11 @@ class ManagedConstantQueryHttpSimulation extends Simulation {
         .execute(parser = {inputStream => jsonObjectMapper.readTree(inputStream)})
       if (!jsonResp.is2xx) throw new RuntimeException(s"Failed to login to ${loginUrl} due to: ${jsonResp.code}")
       jwtToken = jsonResp.body.get("access_token").asText()
+      System.out.println("Access token: " + jsonResp.body);
       val expires_in = jsonResp.body.get("expires_in").asLong()
       val grace_secs = if (expires_in > 15L) 10L else 2L
       jwtExpiresIn = expires_in - grace_secs
+      System.out.println("Successfully refreshed global JWT for load test ... will do again in " + Config.jwtExpiresIn + " sec")
       println(s"Successfully refreshed global JWT for load test ... will do again in ${jwtExpiresIn} secs")
     }
 
@@ -61,6 +63,7 @@ class ManagedConstantQueryHttpSimulation extends Simulation {
 
       // Get the initial token ...
       updateJwtToken()
+      System.out.println("Received initial JWT from POST to https://pg01.us-west1.cloud.lucidworks.com/oauth2/token" + Config.jwtToken);
       println(s"Received initial JWT from POST to https://pg01.us-west1.cloud.lucidworks.com/oauth2/token: ${jwtToken}\n")
 
       // Schedule a background task to refresh it before the token expires
@@ -77,6 +80,7 @@ class ManagedConstantQueryHttpSimulation extends Simulation {
         def run(): Unit = updateJwtToken()
       }
       ex.scheduleAtFixedRate(task, jwtExpiresIn, jwtExpiresIn, TimeUnit.SECONDS)
+      System.out.println("Started background thread to refresh JWT in " + Config.jwtExpiresIn + " seconds from now ...")
       println(s"Started background thread to refresh JWT in ${jwtExpiresIn} seconds from now ...\n")
     }
 
@@ -95,7 +99,7 @@ class ManagedConstantQueryHttpSimulation extends Simulation {
     val search = feed(feeder).exec(
       http("QueryRequest").
         get(Config.solrUrl + "/" + Config.defaultCollection + "/select?" + Config.basequery).
-        header("Authorization", "Bearer " + saveGlobalJWTInSession))
+        header("Authorization", "Bearer ${jwt}"))
 
   }
 
