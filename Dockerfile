@@ -10,7 +10,7 @@ ENV GATLING_VERSION=3.0.0 \
     SOLR_VERSION=8.4.1 \
     SCALA_VERSION=2.12.7 \
     SBT_VERSION=1.2.1 \
-    GATLING_SOLR_BRANCH=varinat/azure
+    GATLING_SOLR_BRANCH=filtered/branch
 
 # Install Scala
 RUN \
