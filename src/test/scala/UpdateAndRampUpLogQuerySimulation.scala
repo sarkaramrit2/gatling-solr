@@ -308,50 +308,50 @@ class UpdateAndRampUpLogQuerySimulation extends Simulation {
   System.out.println("podNo: " + Config.podNo.toInt)
   log.info("podNo: " + Config.podNo.toInt)
 
-  var indexExecute: Boolean = false
-  var updateExecute: Boolean = false
-
-  if (Config.indexParallelNodes.toInt > 1 && Config.indexTotalFiles.toInt > 1) {
-    if (Config.podNo.toInt < Config.indexParallelNodes.toInt && Config.podNo.toInt <= Config.indexTotalFiles.toInt) {
-      indexExecute = true
-    }
-  }
-
-  if (Config.updateParallelNodes.toInt > 1 && Config.updateTotalFiles.toInt > 1) {
-    if (Config.podNo.toInt < Config.updateParallelNodes.toInt && Config.podNo.toInt <= Config.updateTotalFiles.toInt) {
-      updateExecute = true
-    }
-  }
-
-  if (indexExecute && updateExecute) {
-    setUp(
-      index.inject(
-        constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
-        .protocols(solrConf),
-      update.inject(
-        constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
-        .protocols(solrConf)
-    )
-  }
-  else if (!indexExecute && updateExecute) {
-    setUp(
-      update.inject(
-        constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
-        .protocols(solrConf)
-    )
-  }
-  else if (indexExecute && !updateExecute) {
-    setUp(
-      index.inject(
-        constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
-        .protocols(solrConf)
-    )
-  }
-  else {
+//  var indexExecute: Boolean = false
+//  var updateExecute: Boolean = false
+//
+//  if (Config.indexParallelNodes.toInt > 1 && Config.indexTotalFiles.toInt > 1) {
+//    if (Config.podNo.toInt < Config.indexParallelNodes.toInt && Config.podNo.toInt <= Config.indexTotalFiles.toInt) {
+//      indexExecute = true
+//    }
+//  }
+//
+//  if (Config.updateParallelNodes.toInt > 1 && Config.updateTotalFiles.toInt > 1) {
+//    if (Config.podNo.toInt < Config.updateParallelNodes.toInt && Config.podNo.toInt <= Config.updateTotalFiles.toInt) {
+//      updateExecute = true
+//    }
+//  }
+//
+//  if (indexExecute && updateExecute) {
+//    setUp(
+//      index.inject(
+//        constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
+//        .protocols(solrConf),
+//      update.inject(
+//        constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
+//        .protocols(solrConf)
+//    )
+//  }
+//  else if (!indexExecute && updateExecute) {
+//    setUp(
+//      update.inject(
+//        constantUsersPerSec(Config.updateMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
+//        .protocols(solrConf)
+//    )
+//  }
+//  else if (indexExecute && !updateExecute) {
+//    setUp(
+//      index.inject(
+//        constantUsersPerSec(Config.indexMaxNumUsers.toDouble) during (Config.totalTimeInMinutes.toDouble minutes))
+//        .protocols(solrConf)
+//    )
+//  }
+//  else {
     setUp(
       query.inject(
         rampUsersPerSec(Config.queryMinNumUsers.toDouble) to Config.queryMaxNumUsers.toDouble during
           (Config.totalTimeInMinutes.toDouble minutes)).protocols(solrConf)
     )
-  }
+//  }
 }

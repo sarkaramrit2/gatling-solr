@@ -7,9 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.lucidworks.cloud.{OAuth2HttpRequestInterceptor, OAuth2HttpRequestInterceptorBuilder}
 import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
+import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import lucidworks.gatling.solr.Predef._
-import org.apache.solr.client.solrj.impl.{HttpClientUtil}
+import lucidworks.gatling.solr.protocol.SolrProtocol
+import org.apache.solr.client.solrj.impl.HttpClientUtil
 import scalaj.http.Http
 
 import scala.concurrent.duration._
@@ -335,9 +337,9 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
 
   }
 
-  val clientId = Option(System.getenv("OAUTH2_CLIENT_ID"))
+  val clientId: Option[String] = Option(System.getenv("OAUTH2_CLIENT_ID"))
   val oauth2ClientId: String = if (clientId.isDefined) clientId.get else System.getProperty("OAUTH2_CLIENT_ID")
-  val clientSecret = Option(System.getenv("OAUTH2_CLIENT_SECRET"))
+  val clientSecret: Option[String] = Option(System.getenv("OAUTH2_CLIENT_SECRET"))
   val oauth2ClientSecret: String = if (clientSecret.isDefined) clientSecret.get else System.getProperty("OAUTH2_CLIENT_SECRET")
 
   // create http request interceptor and start it
@@ -353,14 +355,15 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
   //  client.commit(false, true)
 
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
-  val solrConf = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection).numClients(Config.numClients.toInt).properties(Config.prop)
+  val solrConf: SolrProtocol = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection).numClients(Config.numClients.toInt).properties(Config.prop).
+    authClientId(oauth2ClientId).authClientSecret(oauth2ClientSecret)
 
   // A scenario where users execute queries
-  val query = scenario("QUERY").exec(Query.saveGlobalJWTInSession).exec(Query.search)
+  val query: ScenarioBuilder = scenario("QUERY").exec(Query.saveGlobalJWTInSession).exec(Query.search)
 
-  val index = scenario("INDEX").exec(Index.search)
+  val index: ScenarioBuilder = scenario("INDEX").exec(Index.search)
 
-  val update = scenario("UPDATE").exec(Update.search)
+  val update: ScenarioBuilder = scenario("UPDATE").exec(Update.search)
 
   var indexExecute: Boolean = false
   var updateExecute: Boolean = false
