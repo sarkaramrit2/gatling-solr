@@ -25,6 +25,9 @@ case class SolrRequestBuilder(requestName: Expression[String]) {
   def query[K](payload: Expression[String]): SolrQueryRequestActionBuilder[K] =
     new SolrQueryRequestActionBuilder(SolrQueryAttributes(requestName, payload))
 
+  def logQuery[K](payload: Expression[String]): SolrQueryLogRequestActionBuilder[K] =
+    new SolrQueryLogRequestActionBuilder(SolrQueryAttributes(requestName, payload))
+
   def index[K, V](header: String, payload: Expression[String]): SolrIndexRequestActionBuilder[K, V] =
     new SolrIndexRequestActionBuilder(SolrIndexAttributes(requestName, header, payload))
 
@@ -33,4 +36,7 @@ case class SolrRequestBuilder(requestName: Expression[String]) {
 
   def managedQuery[K](payload: Expression[String]): ManagedSolrQueryRequestActionBuilder[K] =
     new ManagedSolrQueryRequestActionBuilder(SolrQueryAttributes(requestName, payload))
+
+  def managedLogQuery[K](payload: Expression[String]): ManagedSolrQueryLogRequestActionBuilder[K] =
+    new ManagedSolrQueryLogRequestActionBuilder(SolrQueryAttributes(requestName, payload))
 }
