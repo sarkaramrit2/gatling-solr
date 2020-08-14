@@ -41,6 +41,7 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
       val outcome =
         sendRequest(
           requestName,
+          solrClients.size,
           solrClients.get((session.userId % solrClients.size).toInt), // round robin for solrclients
           solrAttributes,
           throttled,
@@ -58,12 +59,15 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
   }
 
   private def sendRequest(requestName: String,
+                          clientsSize: Int,
                           solrClient: CloudSolrClient,
                           solrAttributes: SolrQueryAttributes[V],
                           throttled: Boolean,
                           session: Session): Validation[Unit] = {
 
     solrAttributes payload session map { payload =>
+
+      System.out.println("session userId: " + session.userId + ", client no: " + (session.userId % solrClients.size).toInt)
 
       val params = new ModifiableSolrParams();
       for (param <- URLEncodedUtils.parse(payload, Charset.forName("UTF-8"))) {
@@ -93,6 +97,7 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
       val requestEndDate = clock.nowMillis
 
       if (response != null) {
+        System.out.println(requestEndDate - requestStartDate)
         statsEngine.logResponse(
           session,
           requestName,
