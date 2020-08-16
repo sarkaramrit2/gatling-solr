@@ -20,7 +20,14 @@ class SolrIndexRequestActionBuilder[K, V](solrAttributes: SolrIndexAttributes[K,
 
     val solrClients = new util.ArrayList[CloudSolrClient]()
 
-    for( i <- 0 until solrComponents.solrProtocol.numClients){
+    var clientsCount = solrComponents.solrProtocol.numClients
+
+    if (solrComponents.solrProtocol.numIndexClients > 0 ) {
+      clientsCount = solrComponents.solrProtocol.numIndexClients
+    }
+
+
+    for( i <- 0 until clientsCount){
       var solrClient= null: CloudSolrClient;
       solrClient = new CloudSolrClient.Builder().withZkHost(solrComponents.solrProtocol.zkhost).build()
       solrClient.setDefaultCollection(solrComponents.solrProtocol.collection)

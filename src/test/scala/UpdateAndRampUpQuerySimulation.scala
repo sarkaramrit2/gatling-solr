@@ -36,6 +36,7 @@ class UpdateAndRampUpQuerySimulation extends Simulation {
     val apiKey = prop.getProperty("apiKey", "--empty-here--")
     val defaultCollection = prop.getProperty("defaultCollection", "test")
     val numClients = prop.getProperty("numClients", "1")
+    val numIndexClients = prop.getProperty("numIndexClients", "1")
     val oauth2CustomerId = prop.getProperty("CUSTOMER_ID", "lucidworks")
 
     val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
@@ -296,7 +297,8 @@ class UpdateAndRampUpQuerySimulation extends Simulation {
 
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
-  val solrConf = solr.zkhost(Config.zkHost).collection(Config.defaultCollection).numClients(Config.numClients.toInt).properties(Config.prop)
+  val solrConf = solr.zkhost(Config.zkHost).collection(Config.defaultCollection).numClients(Config.numClients.toInt).
+    numIndexClients(Config.numIndexClients.toInt).properties(Config.prop)
 
   // A scenario where users execute queries
   val query = scenario("QUERY").exec(Query.search)

@@ -51,7 +51,8 @@ case class SolrProtocol(
                          apikey: String,
                          collection: String,
                          properties: Properties,
-                         numClients: Int) extends Protocol {
+                         numClients: Int,
+                         numIndexClients: Int) extends Protocol {
 
   def authClientId(authClientId: String): SolrProtocol = copy(authClientId = authClientId)
 
@@ -70,4 +71,6 @@ case class SolrProtocol(
   def properties(properties: Properties): SolrProtocol = copy(properties = properties)
 
   def numClients(numClients: Int): SolrProtocol = copy(numClients = numClients)
+
+  def numIndexClients(numIndexClients: Int): SolrProtocol = copy(numIndexClients = numIndexClients)
 }

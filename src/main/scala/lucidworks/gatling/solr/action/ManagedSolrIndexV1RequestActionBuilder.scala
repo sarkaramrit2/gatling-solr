@@ -32,7 +32,11 @@ class ManagedSolrIndexV1RequestActionBuilder[K, V](solrAttributes: SolrIndexAttr
     // register http request interceptor with solrj
     HttpClientUtil.addRequestInterceptor(oauth2HttpRequestInterceptor)
 
-    val clientsCount = solrComponents.solrProtocol.numClients
+    var clientsCount = solrComponents.solrProtocol.numClients
+
+    if (solrComponents.solrProtocol.numIndexClients > 0 ) {
+      clientsCount = solrComponents.solrProtocol.numIndexClients
+    }
 
     for( i <- 0 until clientsCount){
       var solrClient= null: CloudSolrClient;
