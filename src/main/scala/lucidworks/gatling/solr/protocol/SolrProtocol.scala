@@ -17,7 +17,8 @@ object SolrProtocol {
     apikey = "",
     collection = "",
     properties = new Properties(),
-    numClients = 0
+    numClients = 0,
+    numIndexClients = 0
   )
 
   val SolrProtocolKey = new ProtocolKey[SolrProtocol, SolrComponents] {
