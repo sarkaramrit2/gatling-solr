@@ -41,6 +41,7 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
     val apiKey = prop.getProperty("apiKey", "--empty-here--")
     val defaultCollection = prop.getProperty("defaultCollection", "test")
     val numClients = prop.getProperty("numClients", "1")
+    val numIndexClients = prop.getProperty("numIndexClients", "1")
     val oauth2CustomerId = prop.getProperty("CUSTOMER_ID", "lucidworks")
 
     val indexFilePath = prop.getProperty("indexFilePath", "/opt/gatling/user-files/" +
@@ -355,8 +356,7 @@ class ManagedUpdateAndRampUpHttpQuerySimulation extends Simulation {
   //  client.commit(false, true)
 
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
-  val solrConf: SolrProtocol = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection).numClients(Config.numClients.toInt).properties(Config.prop).
-    authClientId(oauth2ClientId).authClientSecret(oauth2ClientSecret)
+  val solrConf: SolrProtocol = solr.solrurl(Config.solrUrl).collection(Config.defaultCollection).numClients(Config.numClients.toInt).numIndexClients(Config.numIndexClients.toInt).properties(Config.prop).authClientId(oauth2ClientId).authClientSecret(oauth2ClientSecret)
 
   // A scenario where users execute queries
   val query: ScenarioBuilder = scenario("QUERY").exec(Query.saveGlobalJWTInSession).exec(Query.search)

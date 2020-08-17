@@ -297,8 +297,7 @@ class UpdateAndRampUpQuerySimulation extends Simulation {
 
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
   // pass zookeeper string, default collection to query, poolSize for CloudSolrClients
-  val solrConf = solr.zkhost(Config.zkHost).collection(Config.defaultCollection).numClients(Config.numClients.toInt).
-    numIndexClients(Config.numIndexClients.toInt).properties(Config.prop)
+  val solrConf = solr.zkhost(Config.zkHost).collection(Config.defaultCollection).numClients(Config.numClients.toInt).numIndexClients(Config.numIndexClients.toInt).properties(Config.prop)
 
   // A scenario where users execute queries
   val query = scenario("QUERY").exec(Query.search)
