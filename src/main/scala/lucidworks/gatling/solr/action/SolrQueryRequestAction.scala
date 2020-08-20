@@ -70,7 +70,7 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
       System.out.println("session userId: " + session.userId + ", client no: " + (session.userId % solrClients.size).toInt)
 
       val params = new ModifiableSolrParams();
-      for (param <- URLEncodedUtils.parse(payload, Charset.forName("UTF-8"))) {
+      for (param <- URLEncodedUtils.parse(payload, Charset.forName(Charset.defaultCharset().name()))) {
         params.add(param.getName, param.getValue)
       }
 
@@ -103,7 +103,7 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
           requestName,
           startTimestamp = requestStartDate,
           endTimestamp = requestEndDate,
-          if (response.getException == null) OK else KO,
+          if (response.getStatus == 0) OK else KO,
           None,
           if (response.getException == null) None else Some(response.getException.getMessage)
         )
