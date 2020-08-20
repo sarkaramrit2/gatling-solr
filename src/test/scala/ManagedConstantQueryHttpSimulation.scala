@@ -43,7 +43,7 @@ class ManagedConstantQueryHttpSimulation extends Simulation {
     def updateJwtToken() = {
       val loginUrl = s"https://pg01.us-west1.cloud.lucidworks.com/oauth2/default/" + Config.oauth2CustomerId + "/v1/token"
       val jsonResp = Http(loginUrl).postData("grant_type=client_credentials&scope=com.lucidworks.cloud.search.solr.customer")
-        .header("authorization", "Basic MG9hY3FobHJoU3U1Q0k1ODkzNTY6bnZhZmtBVUxoeEJCc1JXUGZKRmtXR0JVd1J3bVZCV1lhaHpxak0zdQ==")
+        .header("authorization", "Basic XXXXXXXXXXXXXXXXXXXXXXx")
         .header("accept", "application/json")
         .header("cache-control", "no-cache")
         .header("content-type", "application/x-www-form-urlencoded")
