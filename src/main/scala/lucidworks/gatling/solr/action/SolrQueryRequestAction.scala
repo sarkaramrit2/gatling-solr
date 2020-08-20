@@ -67,8 +67,6 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
 
     solrAttributes payload session map { payload =>
 
-      System.out.println("session userId: " + session.userId + ", client no: " + (session.userId % solrClients.size).toInt)
-
       val params = new ModifiableSolrParams();
       for (param <- URLEncodedUtils.parse(payload, Charset.forName(Charset.defaultCharset().name()))) {
         params.add(param.getName, param.getValue)
