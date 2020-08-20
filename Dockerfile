@@ -1,4 +1,4 @@
-FROM openjdk:11
+FROM amazoncorretto:latest
 
 MAINTAINER Amrit Sarkar <sarkaramrit2@gmail.com>
 
@@ -14,25 +14,25 @@ ENV GATLING_VERSION=3.0.0 \
 
 # Install Scala
 RUN \
-  apt-get update -y && apt-get install -y --no-install-recommends apt-util && \
-  apt-get update -y; apt-get install curl -y && \
+  yum update -y && yum install -y gzip epel-release && \
+  yum repolist update -y; yum install curl tar -y && \
   curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /root/ && \
   echo >> /root/.bashrc && \
   echo "export PATH=~/scala-$SCALA_VERSION/bin:$PATH" >> /root/.bashrc
 
 # Install sbt
 RUN \
-  curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \
-  dpkg -i sbt-$SBT_VERSION.deb && \
-  rm sbt-$SBT_VERSION.deb && \
-  apt-get update && \
-  apt-get install sbt && \
+  curl -L -o sbt-$SBT_VERSION.rpm https://dl.bintray.com/sbt/rpm/sbt-$SBT_VERSION.rpm && \
+  rpm -U sbt-$SBT_VERSION.rpm && \
+  rm sbt-$SBT_VERSION.rpm && \
+  yum update && \
+  yum install sbt && \
   sbt sbtVersion
 
 #install git and create gatling-solr library
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y git && \
+RUN yum update && \
+    yum upgrade -y && \
+    yum install -y git && \
     mkdir -p /tmp/downloads/gatling-solr && \
     cd /tmp/downloads/gatling-solr && \
     git clone https://github.com/sarkaramrit2/gatling-solr.git && \
@@ -40,11 +40,11 @@ RUN apt-get update && \
     git checkout $GATLING_SOLR_BRANCH && \
     sbt clean assembly && \
     # install ps
-    apt-get install procps -y && \
+    yum install procps -y && \
     cd /
 
 # install gatling
-RUN apt-get install wget bash && \
+RUN yum install -y wget bash unzip && \
   wget -q -O /tmp/downloads/gatling-$GATLING_VERSION.zip \
   https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/$GATLING_VERSION/gatling-charts-highcharts-bundle-$GATLING_VERSION-bundle.zip && \
   mkdir -p /tmp/archive && cd /tmp/archive && \
