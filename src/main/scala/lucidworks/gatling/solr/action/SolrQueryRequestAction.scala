@@ -15,7 +15,9 @@ import io.gatling.core.util.NameGen
 import lucidworks.gatling.solr.protocol.SolrProtocol
 import lucidworks.gatling.solr.request.builder.SolrQueryAttributes
 import org.apache.http.client.utils.URLEncodedUtils
+import org.apache.solr.client.solrj.SolrRequest
 import org.apache.solr.client.solrj.impl.CloudSolrClient
+import org.apache.solr.client.solrj.request.QueryRequest
 import org.apache.solr.client.solrj.response.QueryResponse
 import org.apache.solr.common.params.ModifiableSolrParams
 
@@ -74,7 +76,8 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
 
       val requestStartDate = clock.nowMillis
       try {
-        solrClient.query(params)
+        solrClient.request(new QueryRequest(params, SolrRequest.METHOD.GET))
+        //solrClient.query(params)
       }
       catch {
         case ex: Exception => {
