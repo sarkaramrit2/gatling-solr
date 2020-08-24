@@ -73,9 +73,8 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
       }
 
       val requestStartDate = clock.nowMillis
-      var response: QueryResponse = null
       try {
-        response = solrClient.queryAndStreamResponse(params, null);
+        solrClient.query(params)
       }
       catch {
         case ex: Exception => {
@@ -94,18 +93,16 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
       }
       val requestEndDate = clock.nowMillis
 
-      if (response != null) {
-        System.out.println(requestEndDate - requestStartDate)
-        statsEngine.logResponse(
-          session,
-          requestName,
-          startTimestamp = requestStartDate,
-          endTimestamp = requestEndDate,
-          if (response.getStatus == 0) OK else KO,
-          None,
-          if (response.getException == null) None else Some(response.getException.getMessage)
-        )
-      }
+      System.out.println(requestEndDate - requestStartDate)
+      statsEngine.logResponse(
+        session,
+        requestName,
+        startTimestamp = requestStartDate,
+        endTimestamp = requestEndDate,
+        OK,
+        None,
+        None
+      )
       next ! session
     }
   }
