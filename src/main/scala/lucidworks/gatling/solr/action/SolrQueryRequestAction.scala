@@ -15,9 +15,7 @@ import io.gatling.core.util.NameGen
 import lucidworks.gatling.solr.protocol.SolrProtocol
 import lucidworks.gatling.solr.request.builder.SolrQueryAttributes
 import org.apache.http.client.utils.URLEncodedUtils
-import org.apache.solr.client.solrj.SolrRequest
 import org.apache.solr.client.solrj.impl.CloudSolrClient
-import org.apache.solr.client.solrj.request.QueryRequest
 import org.apache.solr.client.solrj.response.QueryResponse
 import org.apache.solr.common.params.ModifiableSolrParams
 
@@ -69,15 +67,18 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
 
     solrAttributes payload session map { payload =>
 
+      // execute all first and let all run in their own time?
+      next ! session
+
       val params = new ModifiableSolrParams();
       for (param <- URLEncodedUtils.parse(payload, Charset.forName(Charset.defaultCharset().name()))) {
         params.add(param.getName, param.getValue)
       }
 
       val requestStartDate = clock.nowMillis
+      var response: QueryResponse = null
       try {
-        //solrClient.request(new QueryRequest(params, SolrRequest.METHOD.GET))
-        solrClient.query(params)
+        response = solrClient.query(params)
       }
       catch {
         case ex: Exception => {
@@ -96,17 +97,18 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
       }
       val requestEndDate = clock.nowMillis
 
-      System.out.println(requestEndDate - requestStartDate)
-      statsEngine.logResponse(
-        session,
-        requestName,
-        startTimestamp = requestStartDate,
-        endTimestamp = requestEndDate,
-        OK,
-        None,
-        None
-      )
-      next ! session
+      if (response != null) {
+        System.out.println(requestEndDate - requestStartDate)
+        statsEngine.logResponse(
+          session,
+          requestName,
+          startTimestamp = requestStartDate,
+          endTimestamp = requestEndDate,
+          if (response.getException == null) OK else KO,
+          None,
+          if (response.getException == null) None else Some(response.getException.getMessage)
+        )
+      }
     }
   }
 }
