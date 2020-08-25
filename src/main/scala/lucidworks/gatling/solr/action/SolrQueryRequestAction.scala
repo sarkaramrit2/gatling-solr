@@ -77,7 +77,7 @@ class SolrQueryRequestAction[K, V](val solrClients:  util.ArrayList[CloudSolrCli
       val requestStartDate = clock.nowMillis
       try {
         //solrClient.request(new QueryRequest(params, SolrRequest.METHOD.GET))
-        //solrClient.query(params)
+        solrClient.query(params)
       }
       catch {
         case ex: Exception => {
